@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Neon Sync — Smart LED Studio</title>
-    <meta name="description" content="Ultimate Web Bluetooth Controller for RGB & Addressable LED Strips (MELK-OA10 / ELK-BLEDOM)">
+    <meta name="description" content="Ultimate Web Bluetooth Controller for RGB & Addressable LED Strips (Ambilight, MP3 Player, Voice Commands, 212 Modes)">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#00f0b5">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -49,7 +51,7 @@
         }
 
         /* ========================================================
-           PC / LAPTOP LAYOUT (Default >= 768px)
+           PC / LAPTOP LAYOUT
            ======================================================== */
         .app-container {
             display: flex;
@@ -66,7 +68,7 @@
             border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
-            padding: 20px 16px;
+            padding: 18px 14px;
             flex-shrink: 0;
             z-index: 20;
         }
@@ -75,9 +77,9 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 8px 12px 24px;
+            padding: 6px 10px 18px;
             border-bottom: 1px solid var(--border);
-            margin-bottom: 16px;
+            margin-bottom: 14px;
         }
 
         .brand-icon {
@@ -105,7 +107,7 @@
         }
 
         .brand-text span {
-            font-size: 0.7rem;
+            font-size: 0.68rem;
             color: var(--text-muted);
             font-weight: 600;
             text-transform: uppercase;
@@ -115,29 +117,30 @@
         .nav-group {
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 4px;
             flex: 1;
+            overflow-y: auto;
         }
 
         .nav-label {
-            font-size: 0.68rem;
+            font-size: 0.65rem;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.1em;
             color: var(--text-sub);
-            padding: 8px 12px 4px;
+            padding: 8px 10px 4px;
         }
 
         .nav-btn {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 12px 14px;
+            padding: 10px 12px;
             border-radius: var(--radius-md);
             background: transparent;
             border: 1px solid transparent;
             color: var(--text-muted);
-            font-size: 0.9rem;
+            font-size: 0.88rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
@@ -146,10 +149,11 @@
         }
 
         .nav-btn svg {
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             stroke-width: 2;
             transition: transform 0.2s;
+            flex-shrink: 0;
         }
 
         .nav-btn:hover {
@@ -161,7 +165,7 @@
             background-color: rgba(var(--accent-rgb), 0.1);
             border-color: rgba(var(--accent-rgb), 0.25);
             color: var(--accent);
-            box-shadow: 0 0 20px rgba(var(--accent-rgb), 0.1);
+            box-shadow: 0 0 16px rgba(var(--accent-rgb), 0.1);
         }
 
         .nav-btn.active svg {
@@ -170,19 +174,19 @@
         }
 
         .sidebar-footer {
-            padding-top: 16px;
+            padding-top: 14px;
             border-top: 1px solid var(--border);
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
 
         .device-info-badge {
             background: var(--bg-elevated);
             border: 1px solid var(--border);
             border-radius: var(--radius-sm);
-            padding: 10px;
-            font-size: 0.75rem;
+            padding: 8px 10px;
+            font-size: 0.72rem;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -202,7 +206,7 @@
             box-shadow: 0 0 10px var(--accent);
         }
 
-        /* --- MAIN VIEW AREA (PC) --- */
+        /* --- MAIN VIEW AREA --- */
         .main-wrapper {
             flex: 1;
             display: flex;
@@ -211,9 +215,10 @@
             overflow: hidden;
             min-width: 0;
             background-color: var(--bg-base);
+            position: relative;
         }
 
-        /* --- TOP APP HEADER (PC & Mobile) --- */
+        /* --- TOP APP HEADER --- */
         .header-bar {
             height: var(--header-h);
             background-color: var(--bg-surface);
@@ -221,7 +226,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 28px;
+            padding: 0 24px;
             flex-shrink: 0;
             z-index: 10;
         }
@@ -233,7 +238,7 @@
         }
 
         .page-title {
-            font-size: 1.15rem;
+            font-size: 1.1rem;
             font-weight: 700;
             color: var(--text-main);
         }
@@ -241,7 +246,7 @@
         .header-right {
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 12px;
         }
 
         .live-preview-pill {
@@ -252,7 +257,7 @@
             border: 1px solid var(--border);
             padding: 6px 12px;
             border-radius: 100px;
-            font-size: 0.8rem;
+            font-size: 0.78rem;
             font-weight: 600;
             font-family: 'JetBrains Mono', monospace;
         }
@@ -267,6 +272,38 @@
             transition: background 0.2s;
         }
 
+        .btn-voice {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-voice:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .btn-voice.listening {
+            background: var(--danger);
+            color: #fff;
+            border-color: var(--danger);
+            animation: pulseVoice 1.2s infinite;
+        }
+
+        @keyframes pulseVoice {
+            0% { box-shadow: 0 0 0 0 rgba(255, 51, 102, 0.6); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 51, 102, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 51, 102, 0); }
+        }
+
         .btn-connect {
             display: flex;
             align-items: center;
@@ -274,9 +311,9 @@
             background: var(--bg-elevated);
             color: var(--text-main);
             border: 1px solid var(--border);
-            padding: 8px 16px;
+            padding: 8px 14px;
             border-radius: 100px;
-            font-size: 0.82rem;
+            font-size: 0.8rem;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s;
@@ -296,8 +333,8 @@
         }
 
         .btn-power {
-            width: 40px;
-            height: 40px;
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
             background: var(--bg-elevated);
             border: 1px solid var(--border);
@@ -318,7 +355,37 @@
             background: var(--accent);
             color: #000;
             border-color: var(--accent);
-            box-shadow: 0 0 20px var(--accent-glow);
+            box-shadow: 0 0 18px var(--accent-glow);
+        }
+
+        /* --- VOICE ASSISTANT TOAST --- */
+        .voice-toast {
+            position: absolute;
+            top: 75px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            background: rgba(22, 24, 36, 0.95);
+            border: 1px solid var(--accent);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(var(--accent-rgb), 0.2);
+            backdrop-filter: blur(12px);
+            padding: 10px 20px;
+            border-radius: 100px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .voice-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+            pointer-events: auto;
         }
 
         /* --- SCROLLABLE TAB CONTAINER --- */
@@ -326,7 +393,7 @@
             flex: 1;
             overflow-y: auto;
             overflow-x: hidden;
-            padding: 28px;
+            padding: 24px;
             scrollbar-width: thin;
             scrollbar-color: var(--border) transparent;
         }
@@ -356,21 +423,12 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* ========================================================
-           TAB 1: ADJUST (PC MULTI-COLUMN GRID)
-           ======================================================== */
-        .adjust-grid {
-            display: grid;
-            grid-template-columns: 420px 1fr;
-            gap: 32px;
-            align-items: start;
-        }
-
+        /* Generic Cards & Utilities */
         .card {
             background: var(--bg-surface);
             border: 1px solid var(--border);
             border-radius: var(--radius-lg);
-            padding: 24px;
+            padding: 20px;
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
         }
 
@@ -378,16 +436,26 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
         .card-title {
-            font-size: 0.95rem;
+            font-size: 0.92rem;
             font-weight: 700;
             color: var(--text-main);
             display: flex;
             align-items: center;
             gap: 8px;
+        }
+
+        /* ========================================================
+           TAB 1: ADJUST
+           ======================================================== */
+        .adjust-grid {
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            gap: 28px;
+            align-items: start;
         }
 
         .wheel-container {
@@ -400,8 +468,8 @@
 
         .wheel-canvas-wrap {
             position: relative;
-            width: 320px;
-            height: 320px;
+            width: 300px;
+            height: 300px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -419,8 +487,8 @@
 
         .wheel-center-preview {
             position: absolute;
-            width: 64px;
-            height: 64px;
+            width: 58px;
+            height: 58px;
             border-radius: 50%;
             background: #ff00ff;
             border: 4px solid var(--bg-surface);
@@ -432,29 +500,28 @@
         .controls-stack {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 16px;
         }
 
-        /* Precision Inputs */
         .rgb-inputs-row {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
+            gap: 10px;
         }
 
         .rgb-box {
             background: var(--bg-elevated);
             border: 1px solid var(--border);
             border-radius: var(--radius-md);
-            padding: 10px 14px;
+            padding: 8px 12px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .rgb-box span {
             font-weight: 800;
-            font-size: 1rem;
+            font-size: 0.9rem;
             font-family: 'JetBrains Mono', monospace;
         }
 
@@ -467,24 +534,23 @@
             background: transparent;
             border: none;
             color: var(--text-main);
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 700;
             font-family: 'JetBrains Mono', monospace;
             outline: none;
         }
 
-        /* Modern Range Sliders */
         .slider-component {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
         }
 
         .slider-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.82rem;
+            font-size: 0.78rem;
             font-weight: 600;
             color: var(--text-muted);
         }
@@ -499,7 +565,7 @@
             -webkit-appearance: none;
             appearance: none;
             width: 100%;
-            height: 8px;
+            height: 7px;
             background: var(--bg-elevated);
             border: 1px solid var(--border);
             border-radius: 100px;
@@ -509,8 +575,8 @@
         .range-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 22px;
-            height: 22px;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
             background: #fff;
             cursor: pointer;
@@ -523,21 +589,15 @@
             transform: scale(1.15);
         }
 
-        /* CCT Color Temperature Slider */
-        .cct-slider-wrap {
-            position: relative;
-        }
-
         .cct-slider {
             background: linear-gradient(90deg, #ff8822 0%, #ffe4b5 50%, #b0e0e6 100%);
             border: none;
         }
 
-        /* Preset Color Buttons */
         .palette-grid {
             display: grid;
             grid-template-columns: repeat(8, 1fr);
-            gap: 10px;
+            gap: 8px;
         }
 
         .palette-chip {
@@ -551,7 +611,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             font-weight: 800;
             color: #000;
         }
@@ -562,21 +622,17 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
         }
 
-        .palette-chip:active {
-            transform: scale(0.95);
-        }
-
         /* ========================================================
-           TAB 2: STYLE (212 ADDRESSABLE MODES)
+           TAB 2: STYLE (212 MODES)
            ======================================================== */
         .style-header-bar {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 20px;
-            margin-bottom: 24px;
+            gap: 16px;
+            margin-bottom: 20px;
             background: var(--bg-surface);
-            padding: 16px 20px;
+            padding: 14px 18px;
             border-radius: var(--radius-md);
             border: 1px solid var(--border);
         }
@@ -593,9 +649,9 @@
             background: transparent;
             border: none;
             color: var(--text-muted);
-            padding: 8px 16px;
+            padding: 6px 14px;
             border-radius: 6px;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
@@ -610,9 +666,9 @@
 
         .modes-grid-container {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 12px;
-            max-height: calc(100vh - 280px);
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 10px;
+            max-height: calc(100vh - 270px);
             overflow-y: auto;
             padding-right: 6px;
         }
@@ -621,12 +677,12 @@
             background: var(--bg-surface);
             border: 1px solid var(--border);
             border-radius: var(--radius-md);
-            padding: 16px;
+            padding: 14px;
             cursor: pointer;
             transition: all 0.2s;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
         .mode-tile:hover {
@@ -638,16 +694,16 @@
         .mode-tile.active {
             border-color: var(--accent);
             background: rgba(var(--accent-rgb), 0.08);
-            box-shadow: 0 0 20px rgba(var(--accent-rgb), 0.15);
+            box-shadow: 0 0 16px rgba(var(--accent-rgb), 0.15);
         }
 
         .mode-tile-num {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             font-weight: 700;
             color: var(--text-sub);
             background: var(--bg-elevated);
-            padding: 4px 8px;
+            padding: 4px 6px;
             border-radius: 6px;
         }
 
@@ -657,7 +713,7 @@
         }
 
         .mode-tile-name {
-            font-size: 0.88rem;
+            font-size: 0.82rem;
             font-weight: 600;
             color: var(--text-main);
             white-space: nowrap;
@@ -666,79 +722,88 @@
         }
 
         /* ========================================================
-           TAB 3: MUSIC (HARDWARE CHIP MODES)
+           TAB 3: SCREEN SYNC (AMBILIGHT)
            ======================================================== */
-        .music-cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 16px;
-        }
-
-        .hw-music-card {
-            background: var(--bg-surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            padding: 24px 20px;
+        .ambilight-layout {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            text-align: center;
-            gap: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .hw-music-card:hover {
-            border-color: rgba(var(--accent-rgb), 0.4);
-            transform: translateY(-3px);
-            background: var(--bg-elevated);
-        }
-
-        .hw-music-card.active {
-            border-color: var(--accent);
-            background: rgba(var(--accent-rgb), 0.1);
-            box-shadow: 0 0 25px rgba(var(--accent-rgb), 0.2);
-        }
-
-        .hw-music-icon {
-            font-size: 2.2rem;
-        }
-
-        .hw-music-name {
-            font-size: 1rem;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        .hw-music-desc {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-
-        /* ========================================================
-           TAB 4: MIC SYNC (LIVE BROWSER WEB AUDIO)
-           ======================================================== */
-        .mic-layout {
-            display: flex;
-            flex-direction: column;
-            gap: 28px;
+            gap: 20px;
             max-width: 800px;
             margin: 0 auto;
         }
 
-        .mic-hero-card {
+        .screen-preview-card {
             background: var(--bg-surface);
             border: 1px solid var(--border);
             border-radius: var(--radius-lg);
-            padding: 28px;
+            padding: 24px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 20px;
             text-align: center;
+            gap: 16px;
         }
 
-        .visualizer-canvas {
+        .screen-video-container {
+            width: 100%;
+            max-width: 600px;
+            aspect-ratio: 16 / 9;
+            background: #000;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #screenVideo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        .screen-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-muted);
+        }
+
+        .ambilight-color-strip {
+            width: 100%;
+            height: 16px;
+            border-radius: 100px;
+            background: #ff00ff;
+            box-shadow: 0 0 25px rgba(255, 0, 255, 0.4);
+            transition: background 0.1s;
+        }
+
+        /* ========================================================
+           TAB 4: MP3 AUDIO PLAYER & HARDWARE MUSIC
+           ======================================================== */
+        .audio-studio-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .player-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .player-visualizer {
             width: 100%;
             height: 120px;
             background: var(--bg-elevated);
@@ -746,10 +811,95 @@
             border: 1px solid var(--border);
         }
 
+        .player-controls-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .track-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            overflow: hidden;
+        }
+
+        .track-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-main);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .track-status {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .file-upload-btn {
+            position: relative;
+            overflow: hidden;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .file-upload-btn input[type=file] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .music-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+            gap: 12px;
+        }
+
+        .hw-music-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 16px 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .hw-music-card:hover {
+            border-color: rgba(var(--accent-rgb), 0.4);
+            transform: translateY(-2px);
+            background: var(--bg-elevated);
+        }
+
+        .hw-music-card.active {
+            border-color: var(--accent);
+            background: rgba(var(--accent-rgb), 0.1);
+            box-shadow: 0 0 20px rgba(var(--accent-rgb), 0.2);
+        }
+
+        .hw-music-icon { font-size: 1.8rem; }
+        .hw-music-name { font-size: 0.85rem; font-weight: 700; color: var(--text-main); }
+        .hw-music-desc { font-size: 0.7rem; color: var(--text-muted); }
+
+        /* ========================================================
+           TAB 5: MIC SYNC
+           ======================================================== */
         .models-grid-8 {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
+            gap: 10px;
             width: 100%;
         }
 
@@ -757,7 +907,7 @@
             background: var(--bg-elevated);
             border: 1px solid var(--border);
             border-radius: var(--radius-md);
-            padding: 14px 10px;
+            padding: 12px 8px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -776,58 +926,32 @@
             border-color: var(--accent);
             background: rgba(var(--accent-rgb), 0.12);
             color: var(--accent);
-            box-shadow: 0 0 15px rgba(var(--accent-rgb), 0.15);
+            box-shadow: 0 0 14px rgba(var(--accent-rgb), 0.15);
         }
 
-        .model-chip-icon {
-            font-size: 1.4rem;
-        }
-
-        .model-chip-title {
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        .model-chip.active .model-chip-title {
-            color: var(--accent);
-        }
+        .model-chip-icon { font-size: 1.3rem; }
+        .model-chip-title { font-size: 0.75rem; font-weight: 700; color: var(--text-main); }
+        .model-chip.active .model-chip-title { color: var(--accent); }
 
         /* ========================================================
-           TAB 5: CUSTOM SEQUENCE STUDIO
+           TAB 6: CUSTOM SEQUENCE STUDIO
            ======================================================== */
-        .seq-studio {
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .timeline-box {
-            background: var(--bg-surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            padding: 24px;
-        }
-
         .timeline-blocks {
             display: flex;
             flex-wrap: wrap;
-            gap: 12px;
-            min-height: 70px;
+            gap: 10px;
+            min-height: 60px;
             align-items: center;
-            justify-content: flex-start;
-            padding: 16px;
+            padding: 14px;
             background: var(--bg-elevated);
             border-radius: var(--radius-md);
             border: 1px dashed var(--border-light);
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
         .timeline-block {
-            width: 48px;
-            height: 48px;
+            width: 44px;
+            height: 44px;
             border-radius: var(--radius-sm);
             border: 2px solid rgba(255, 255, 255, 0.2);
             cursor: pointer;
@@ -836,26 +960,17 @@
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
         }
 
-        .timeline-block:hover {
-            transform: scale(1.1);
-        }
-
+        .timeline-block:hover { transform: scale(1.1); }
         .timeline-block.active {
             transform: scale(1.25);
             border-color: var(--accent);
-            box-shadow: 0 0 20px var(--accent-glow);
+            box-shadow: 0 0 18px var(--accent-glow);
             z-index: 5;
         }
 
-        .timeline-controls {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-
         .color-picker-custom {
-            width: 48px;
-            height: 48px;
+            width: 44px;
+            height: 44px;
             border: 2px solid var(--border);
             border-radius: var(--radius-sm);
             background: none;
@@ -867,15 +982,60 @@
         .color-picker-custom::-webkit-color-swatch { border: none; border-radius: 6px; }
 
         /* ========================================================
-           TAB 6: SCHEDULE & AUTOMATION
+           TAB 7: SCHEDULE & SAVED SCENES
            ======================================================== */
-        .schedule-grid {
+        .saved-scenes-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-            max-width: 800px;
-            margin: 0 auto;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+            margin-top: 14px;
         }
+
+        .scene-card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .scene-card-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .scene-dot {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            flex-shrink: 0;
+        }
+
+        .scene-name {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .btn-scene-del {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            padding: 4px;
+            font-size: 1rem;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .btn-scene-del:hover { opacity: 1; }
 
         .timer-buttons-grid {
             display: grid;
@@ -887,9 +1047,9 @@
             background: var(--bg-elevated);
             border: 1px solid var(--border);
             color: var(--text-main);
-            padding: 14px;
+            padding: 12px;
             border-radius: var(--radius-md);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s;
@@ -907,10 +1067,6 @@
             color: var(--danger);
         }
 
-        .btn-timer.cancel-timer:hover {
-            background: rgba(255, 51, 102, 0.1);
-        }
-
         .time-pick-row {
             display: flex;
             align-items: center;
@@ -918,8 +1074,8 @@
             background: var(--bg-elevated);
             border: 1px solid var(--border);
             border-radius: var(--radius-md);
-            padding: 12px 16px;
-            margin-bottom: 12px;
+            padding: 10px 14px;
+            margin-bottom: 10px;
         }
 
         .time-pick-row label {
@@ -931,7 +1087,7 @@
             background: transparent;
             border: none;
             color: var(--text-main);
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 700;
             font-family: 'JetBrains Mono', monospace;
             outline: none;
@@ -939,9 +1095,9 @@
 
         /* Generic Action Buttons */
         .btn-action {
-            padding: 12px 24px;
+            padding: 10px 20px;
             border-radius: var(--radius-md);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 700;
             cursor: pointer;
             border: none;
@@ -981,68 +1137,71 @@
             border: 1px solid rgba(255, 51, 102, 0.3);
         }
 
-        .btn-danger-outline:hover {
-            background: rgba(255, 51, 102, 0.1);
+        /* Keyboard Shortcut Footer Hint */
+        .shortcuts-hint {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            font-size: 0.72rem;
+            color: var(--text-sub);
+            margin-top: 16px;
+        }
+
+        .kbd-badge {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-muted);
         }
 
         /* ========================================================
-           MOBILE PHONE EXCLUSIVE STYLING (< 768px)
+           MOBILE PHONE EXCLUSIVE (< 768px)
            ======================================================== */
-        .mobile-bottom-nav {
-            display: none;
-        }
+        .mobile-bottom-nav { display: none; }
 
         @media (max-width: 767px) {
-            .sidebar {
-                display: none !important;
-            }
-
-            .header-bar {
-                padding: 0 16px;
-                height: 56px;
-            }
-
-            .page-title {
-                font-size: 1rem;
-            }
+            .sidebar { display: none !important; }
+            .header-bar { padding: 0 14px; height: 56px; }
+            .shortcuts-hint { display: none; }
+            .page-title { font-size: 0.95rem; }
 
             .tab-viewport {
-                padding: 16px;
-                padding-bottom: 90px; /* space for bottom nav */
+                padding: 14px;
+                padding-bottom: 84px;
             }
 
-            /* Adjust Grid on Mobile: 1 Column */
             .adjust-grid {
                 grid-template-columns: 1fr;
-                gap: 20px;
+                gap: 16px;
             }
 
             .wheel-canvas-wrap {
-                width: 260px;
-                height: 260px;
+                width: 250px;
+                height: 250px;
             }
 
             .wheel-center-preview {
-                width: 52px;
-                height: 52px;
+                width: 50px;
+                height: 50px;
             }
 
             .palette-grid {
                 grid-template-columns: repeat(4, 1fr);
-                gap: 8px;
+                gap: 6px;
             }
 
             .style-header-bar {
                 flex-direction: column;
                 align-items: stretch;
-                gap: 12px;
+                gap: 10px;
             }
 
             .category-tabs {
                 overflow-x: auto;
                 scrollbar-width: none;
             }
-
             .category-tabs::-webkit-scrollbar { display: none; }
 
             .modes-grid-container {
@@ -1052,16 +1211,11 @@
 
             .music-cards-grid {
                 grid-template-columns: 1fr 1fr;
-                gap: 10px;
+                gap: 8px;
             }
 
             .models-grid-8 {
                 grid-template-columns: repeat(2, 1fr);
-            }
-
-            .schedule-grid {
-                grid-template-columns: 1fr;
-                gap: 16px;
             }
 
             /* MOBILE BOTTOM TAB BAR */
@@ -1071,25 +1225,27 @@
                 bottom: 0;
                 left: 0;
                 width: 100vw;
-                height: 64px;
+                height: 60px;
                 background-color: var(--bg-surface);
                 border-top: 1px solid var(--border);
                 z-index: 100;
                 padding-bottom: env(safe-area-inset-bottom);
                 box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+                overflow-x: auto;
             }
 
             .mob-nav-item {
                 flex: 1;
+                min-width: 50px;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
                 justify-content: center;
-                gap: 4px;
+                gap: 2px;
                 background: transparent;
                 border: none;
                 color: var(--text-muted);
-                font-size: 0.65rem;
+                font-size: 0.6rem;
                 font-weight: 700;
                 cursor: pointer;
                 font-family: inherit;
@@ -1097,10 +1253,9 @@
             }
 
             .mob-nav-item svg {
-                width: 20px;
-                height: 20px;
+                width: 18px;
+                height: 18px;
                 stroke-width: 2;
-                transition: transform 0.15s;
             }
 
             .mob-nav-item.active {
@@ -1126,7 +1281,7 @@
                 </div>
                 <div class="brand-text">
                     <h1>Neon Sync</h1>
-                    <span>Studio 3.0</span>
+                    <span>Studio 3.5 Pro</span>
                 </div>
             </div>
 
@@ -1134,27 +1289,31 @@
                 <span class="nav-label">Lighting Control</span>
                 <button class="nav-btn active" data-tab="tab-adjust">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-                    <span>Adjust Color</span>
+                    <span>1. Adjust Color</span>
                 </button>
                 <button class="nav-btn" data-tab="tab-style">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-                    <span>212 IC Modes</span>
+                    <span>2. 212 IC Modes</span>
+                </button>
+                <button class="nav-btn" data-tab="tab-screen">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                    <span>3. Screen Ambilight</span>
                 </button>
                 <button class="nav-btn" data-tab="tab-music">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-                    <span>Hardware Music</span>
+                    <span>4. MP3 Audio Player</span>
                 </button>
                 <button class="nav-btn" data-tab="tab-mic">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
-                    <span>Microphone Sync</span>
+                    <span>5. Microphone Sync</span>
                 </button>
                 <button class="nav-btn" data-tab="tab-custom">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                    <span>Custom Sequence</span>
+                    <span>6. Custom Studio</span>
                 </button>
                 <button class="nav-btn" data-tab="tab-schedule">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                    <span>Timer & Schedule</span>
+                    <span>7. Scenes & Timers</span>
                 </button>
             </nav>
 
@@ -1180,15 +1339,24 @@
                         <div class="color-dot-live" id="liveColorDot"></div>
                         <span id="liveHexLabel">#FF00FF</span>
                     </div>
+                    <button id="voiceBtn" class="btn-voice" title="AI Voice Command (Key: V)">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                    </button>
                     <button id="connectBtn" class="btn-connect">
                         <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none"><path d="M6.5 6.5l11 11L12 23V1l5.5 5.5-11 11"/></svg>
                         <span id="connStatusText">Pair Bluetooth</span>
                     </button>
-                    <button id="powerBtn" class="btn-power">
+                    <button id="powerBtn" class="btn-power" title="Power Toggle (Spacebar)">
                         <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" fill="none"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg>
                     </button>
                 </div>
             </header>
+
+            <!-- VOICE TOAST -->
+            <div class="voice-toast" id="voiceToast">
+                <span>🎙️</span>
+                <span id="voiceToastText">Listening for commands...</span>
+            </div>
 
             <!-- SCROLLABLE TAB VIEWPORT -->
             <main class="tab-viewport">
@@ -1197,7 +1365,6 @@
                      ============================================ -->
                 <section class="tab-pane active" id="tab-adjust">
                     <div class="adjust-grid">
-                        <!-- Left Card: Color Wheel -->
                         <div class="card wheel-container">
                             <div class="wheel-canvas-wrap">
                                 <canvas id="colorWheel" width="400" height="400"></canvas>
@@ -1205,43 +1372,36 @@
                             </div>
                         </div>
 
-                        <!-- Right Card: Controls & Palettes -->
                         <div class="card controls-stack">
                             <div class="card-header">
-                                <h3 class="card-title">Color Precision</h3>
+                                <h3 class="card-title">Color & White Precision</h3>
                             </div>
 
-                            <!-- RGB Numeric Inputs -->
                             <div class="rgb-inputs-row">
                                 <div class="rgb-box r-box"><span>R</span><input type="number" id="inputR" min="0" max="255" value="255"></div>
                                 <div class="rgb-box g-box"><span>G</span><input type="number" id="inputG" min="0" max="255" value="0"></div>
                                 <div class="rgb-box b-box"><span>B</span><input type="number" id="inputB" min="0" max="255" value="255"></div>
                             </div>
 
-                            <!-- Brightness Slider -->
                             <div class="slider-component">
                                 <div class="slider-top">
-                                    <span>Master Brightness</span>
+                                    <span>Master Brightness (Arrow Up/Down)</span>
                                     <span class="slider-val-badge" id="brightVal">100%</span>
                                 </div>
                                 <input type="range" id="brightnessSlider" min="0" max="100" value="100" class="range-slider">
                             </div>
 
-                            <!-- Color Temperature CCT Slider -->
                             <div class="slider-component">
                                 <div class="slider-top">
-                                    <span>White Temperature (CCT)</span>
+                                    <span>Color Temperature (Warm ↔ Cool White)</span>
                                     <span class="slider-val-badge" id="cctVal">50%</span>
                                 </div>
-                                <div class="cct-slider-wrap">
-                                    <input type="range" id="cctSlider" min="0" max="100" value="50" class="range-slider cct-slider">
-                                </div>
+                                <input type="range" id="cctSlider" min="0" max="100" value="50" class="range-slider cct-slider">
                             </div>
 
-                            <!-- Quick Presets -->
-                            <div class="slider-component" style="margin-top: 10px;">
+                            <div class="slider-component" style="margin-top: 6px;">
                                 <div class="slider-top">
-                                    <span>Vibrant Presets</span>
+                                    <span>Vibrant Palettes</span>
                                 </div>
                                 <div class="palette-grid">
                                     <button class="palette-chip" style="background:#ff0000" data-r="255" data-g="0" data-b="0"></button>
@@ -1255,10 +1415,9 @@
                                 </div>
                             </div>
 
-                            <!-- Scene Presets -->
                             <div class="slider-component">
                                 <div class="slider-top">
-                                    <span>Mood Presets</span>
+                                    <span>Mood Ambience</span>
                                 </div>
                                 <div class="palette-grid">
                                     <button class="palette-chip" style="background:#ff7700" data-r="255" data-g="119" data-b="0"></button>
@@ -1276,7 +1435,7 @@
                 </section>
 
                 <!-- ============================================
-                     TAB 2: STYLE (212 IC MODES)
+                     TAB 2: STYLE (212 MODES)
                      ============================================ -->
                 <section class="tab-pane" id="tab-style">
                     <div class="style-header-bar">
@@ -1286,7 +1445,7 @@
                             <button class="cat-btn" data-filter="trans">Trans (100-150)</button>
                             <button class="cat-btn" data-filter="water">Water (151-212)</button>
                         </div>
-                        <div class="slider-component" style="min-width: 240px;">
+                        <div class="slider-component" style="min-width: 220px;">
                             <div class="slider-top">
                                 <span>Animation Speed</span>
                                 <span class="slider-val-badge" id="styleSpeedVal">50</span>
@@ -1295,45 +1454,86 @@
                         </div>
                     </div>
 
-                    <div class="modes-grid-container" id="modesList">
-                        <!-- Populated by JS -->
-                    </div>
+                    <div class="modes-grid-container" id="modesList"></div>
                 </section>
 
                 <!-- ============================================
-                     TAB 3: HARDWARE MUSIC MODES
+                     TAB 3: SCREEN SYNC (AMBILIGHT)
                      ============================================ -->
-                <section class="tab-pane" id="tab-music">
-                    <div class="style-header-bar" style="margin-bottom: 24px;">
-                        <div>
-                            <h3 style="font-size: 1rem; font-weight:700;">Chipset Audio Sync</h3>
-                            <p style="color:var(--text-muted); font-size:0.8rem;">Internal microphone on the LED strip hardware.</p>
-                        </div>
-                        <div class="slider-component" style="min-width: 200px;">
-                            <div class="slider-top">
-                                <span>Reaction Speed</span>
-                            </div>
-                            <input type="range" id="musicHwSpeed" min="0" max="100" value="50" class="range-slider">
-                        </div>
-                    </div>
-
-                    <div class="music-cards-grid" id="hwMusicGrid">
-                        <!-- Populated by JS -->
-                    </div>
-                </section>
-
-                <!-- ============================================
-                     TAB 4: MICROPHONE SYNC (WEB AUDIO)
-                     ============================================ -->
-                <section class="tab-pane" id="tab-mic">
-                    <div class="mic-layout">
-                        <div class="mic-hero-card">
-                            <h3 style="font-size: 1.2rem; font-weight: 800;">Real-Time Browser Audio Sync</h3>
-                            <p style="color: var(--text-muted); font-size: 0.85rem; max-width: 500px;">
-                                Streams audio directly from your laptop or mobile microphone with ultra-low latency.
+                <section class="tab-pane" id="tab-screen">
+                    <div class="ambilight-layout">
+                        <div class="screen-preview-card">
+                            <h3 style="font-size: 1.2rem; font-weight: 800;">🖥️ TV & Monitor Ambilight Sync</h3>
+                            <p style="color: var(--text-muted); font-size: 0.85rem; max-width: 550px;">
+                                Sync your LED strip with whatever is playing on your screen in real time (Movies, YouTube, Twitch, Games).
                             </p>
 
-                            <canvas id="visualizer" class="visualizer-canvas" width="700" height="140"></canvas>
+                            <div class="screen-video-container">
+                                <video id="screenVideo" autoplay muted playsinline></video>
+                                <div class="screen-placeholder" id="screenPlaceholder">
+                                    <svg viewBox="0 0 24 24" width="48" height="48" stroke="currentColor" fill="none"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                                    <span>Click Start to select your screen or browser tab</span>
+                                </div>
+                            </div>
+
+                            <div class="ambilight-color-strip" id="ambilightStrip"></div>
+
+                            <button id="toggleAmbilightBtn" class="btn-action btn-primary" style="padding: 12px 32px;">
+                                Start Screen Sync
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============================================
+                     TAB 4: MP3 AUDIO PLAYER
+                     ============================================ -->
+                <section class="tab-pane" id="tab-music">
+                    <div class="audio-studio-layout">
+                        <div class="player-card">
+                            <div class="card-header">
+                                <h3 class="card-title">🎵 Local MP3 Player with Beat Sync</h3>
+                                <label class="btn-action btn-outline file-upload-btn">
+                                    📁 Open Song File
+                                    <input type="file" id="audioFileInput" accept="audio/*">
+                                </label>
+                            </div>
+
+                            <canvas id="playerCanvas" class="player-visualizer" width="700" height="120"></canvas>
+
+                            <div class="player-controls-row">
+                                <button id="playAudioBtn" class="btn-action btn-primary" style="width: 44px; height: 44px; border-radius: 50%; padding:0;">
+                                    ▶
+                                </button>
+                                <div class="track-info">
+                                    <span class="track-title" id="trackTitle">No file loaded</span>
+                                    <span class="track-status" id="trackStatus">Upload any MP3 or WAV file to play</span>
+                                </div>
+                            </div>
+                            <audio id="html5Audio" style="display:none;"></audio>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">⚡ Controller Built-in Music Modes</h3>
+                            </div>
+                            <div class="music-cards-grid" id="hwMusicGrid"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============================================
+                     TAB 5: MIC SYNC
+                     ============================================ -->
+                <section class="tab-pane" id="tab-mic">
+                    <div class="ambilight-layout">
+                        <div class="screen-preview-card">
+                            <h3 style="font-size: 1.2rem; font-weight: 800;">🎙️ Real-Time Microphone Sync</h3>
+                            <p style="color: var(--text-muted); font-size: 0.85rem; max-width: 500px;">
+                                Captures live acoustic sound from your phone or laptop microphone.
+                            </p>
+
+                            <canvas id="visualizer" class="player-visualizer" width="700" height="120"></canvas>
 
                             <div style="display: flex; gap: 16px; align-items: center; width: 100%; max-width: 400px;">
                                 <div class="slider-component" style="flex:1;">
@@ -1368,23 +1568,21 @@
                 </section>
 
                 <!-- ============================================
-                     TAB 5: CUSTOM SEQUENCE STUDIO
+                     TAB 6: CUSTOM SEQUENCE STUDIO
                      ============================================ -->
                 <section class="tab-pane" id="tab-custom">
-                    <div class="seq-studio">
-                        <div class="timeline-box">
+                    <div class="ambilight-layout">
+                        <div class="card">
                             <div class="card-header">
-                                <h3 class="card-title">Color Sequence Timeline</h3>
-                                <button id="clearSeqBtn" class="btn-action btn-danger-outline" style="padding: 6px 14px; font-size: 0.78rem;">Clear All</button>
+                                <h3 class="card-title">Custom Timeline Sequencer</h3>
+                                <button id="clearSeqBtn" class="btn-action btn-danger-outline" style="padding: 4px 12px; font-size: 0.75rem;">Clear All</button>
                             </div>
 
-                            <div class="timeline-blocks" id="seqTimeline">
-                                <!-- Populated by JS -->
-                            </div>
+                            <div class="timeline-blocks" id="seqTimeline"></div>
 
-                            <div class="timeline-controls">
+                            <div style="display: flex; gap: 10px; align-items: center;">
                                 <input type="color" id="seqColorPicker" value="#00f0b5" class="color-picker-custom">
-                                <button id="addSeqColorBtn" class="btn-action btn-outline">+ Add Color</button>
+                                <button id="addSeqColorBtn" class="btn-action btn-outline">+ Add Step</button>
                             </div>
                         </div>
 
@@ -1410,41 +1608,57 @@
                 </section>
 
                 <!-- ============================================
-                     TAB 6: TIMER & SCHEDULE
+                     TAB 7: SCHEDULE & SAVED SCENES
                      ============================================ -->
                 <section class="tab-pane" id="tab-schedule">
-                    <div class="schedule-grid">
-                        <div class="card">
+                    <div class="adjust-grid">
+                        <div class="card controls-stack">
                             <div class="card-header">
-                                <h3 class="card-title">Sleep Timer</h3>
+                                <h3 class="card-title">💾 Saved Custom Scenes</h3>
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                <input type="text" id="sceneNameInput" placeholder="Scene name (e.g. Movie Night)" style="flex:1; background:var(--bg-elevated); border:1px solid var(--border); color:#fff; padding:8px 12px; border-radius:8px; outline:none; font-family:inherit;">
+                                <button id="saveSceneBtn" class="btn-action btn-primary" style="padding:8px 14px;">Save Current</button>
+                            </div>
+                            <div class="saved-scenes-grid" id="savedScenesList"></div>
+                        </div>
+
+                        <div class="card controls-stack">
+                            <div class="card-header">
+                                <h3 class="card-title">⏱️ Timers & Automation</h3>
                             </div>
                             <div class="timer-buttons-grid">
-                                <button class="btn-timer" data-mins="15">15 Minutes</button>
-                                <button class="btn-timer" data-mins="30">30 Minutes</button>
+                                <button class="btn-timer" data-mins="15">15 Min</button>
+                                <button class="btn-timer" data-mins="30">30 Min</button>
                                 <button class="btn-timer" data-mins="60">1 Hour</button>
                                 <button class="btn-timer" data-mins="120">2 Hours</button>
                                 <button class="btn-timer cancel-timer" data-mins="0">Cancel Timer</button>
                             </div>
-                            <p id="timerStatusText" style="margin-top: 16px; font-weight: 700; color: var(--accent); font-size: 0.85rem; text-align: center;">No timer active</p>
-                        </div>
+                            <p id="timerStatusText" style="font-weight: 700; color: var(--accent); font-size: 0.8rem; text-align: center;">No timer active</p>
 
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">Daily Automation</h3>
+                            <div style="margin-top: 10px; border-top: 1px solid var(--border); padding-top: 14px;">
+                                <div class="time-pick-row">
+                                    <label>Auto On</label>
+                                    <input type="time" id="schedOnTime" value="18:00">
+                                </div>
+                                <div class="time-pick-row">
+                                    <label>Auto Off</label>
+                                    <input type="time" id="schedOffTime" value="23:30">
+                                </div>
+                                <button id="toggleSchedBtn" class="btn-action btn-outline" style="width: 100%;">Enable Schedule</button>
+                                <p id="schedStatusText" style="margin-top: 8px; font-weight: 600; color: var(--text-muted); font-size: 0.75rem; text-align: center;">Schedule disabled</p>
                             </div>
-                            <div class="time-pick-row">
-                                <label>Auto On Time</label>
-                                <input type="time" id="schedOnTime" value="18:00">
-                            </div>
-                            <div class="time-pick-row">
-                                <label>Auto Off Time</label>
-                                <input type="time" id="schedOffTime" value="23:30">
-                            </div>
-                            <button id="toggleSchedBtn" class="btn-action btn-outline" style="width: 100%; margin-top: 10px;">Enable Schedule</button>
-                            <p id="schedStatusText" style="margin-top: 14px; font-weight: 600; color: var(--text-muted); font-size: 0.8rem; text-align: center;">Schedule disabled</p>
                         </div>
                     </div>
                 </section>
+
+                <div class="shortcuts-hint">
+                    <span><span class="kbd-badge">Space</span> Power</span>
+                    <span><span class="kbd-badge">1-7</span> Tabs</span>
+                    <span><span class="kbd-badge">↑ / ↓</span> Brightness</span>
+                    <span><span class="kbd-badge">V</span> Voice</span>
+                    <span><span class="kbd-badge">M</span> Mute Sync</span>
+                </div>
             </main>
         </div>
 
@@ -1460,9 +1674,13 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
                 <span>Style</span>
             </button>
+            <button class="mob-nav-item" data-tab="tab-screen">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                <span>Screen</span>
+            </button>
             <button class="mob-nav-item" data-tab="tab-music">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-                <span>Music</span>
+                <span>Player</span>
             </button>
             <button class="mob-nav-item" data-tab="tab-mic">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
@@ -1474,16 +1692,16 @@
             </button>
             <button class="mob-nav-item" data-tab="tab-schedule">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                <span>Timer</span>
+                <span>Scenes</span>
             </button>
         </nav>
     </div>
 
     <!-- ============================================
-         EMBEDDED APPLICATION JAVASCRIPT
+         EMBEDDED APPLICATION LOGIC
          ============================================ -->
     <script>
-        // --- APPLICATION STATE ---
+        // --- APP STATE ---
         let bleDevice = null;
         let writeChar = null;
         let isPoweredOn = true;
@@ -1491,6 +1709,8 @@
         let currentMusicModel = 1;
         let lastSentTime = 0;
         let micSensitivity = 5;
+        let currentBrightness = 100;
+        let currentRGB = { r: 255, g: 0, b: 255 };
 
         // --- 212 ADDRESSABLE IC MODES ---
         const MODE_NAMES = {
@@ -1505,7 +1725,6 @@
             41: "White Chase", 42: "7-Color Twinkle", 43: "R-G-B Twinkle",
             44: "R-G-B Flush Close", 45: "R-G-B Flush Open", 46: "Y-C-P Flush Close", 47: "Y-C-P Flush Open"
         };
-
         const MODES = [];
         for (let i = 1; i <= 212; i++) {
             let category = 'water';
@@ -1515,30 +1734,32 @@
             MODES.push({ id: i, name: MODE_NAMES[i] || `Mode ${i}`, category });
         }
 
-        // Hardware Chipset Modes
         const HW_MUSIC_MODES = [
-            { id: 1, name: "Energy Beat", icon: "⚡", desc: "Fast bass tracking" },
-            { id: 2, name: "Spectrum Flow", icon: "🌈", desc: "Full spectrum shift" },
-            { id: 3, name: "Rolling Wave", icon: "🌊", desc: "Smooth color surge" },
-            { id: 4, name: "Stamp Rhythm", icon: "💥", desc: "Beat impact bursts" },
-            { id: 5, name: "Music Sync", icon: "🎵", desc: "Hardware mic reaction" },
-            { id: 6, name: "Heartbeat Pulse", icon: "💓", desc: "Rhythmic breathing" },
-            { id: 7, name: "Dynamic Gradient", icon: "🌟", desc: "Vibrant morphing" },
-            { id: 8, name: "Firework Burst", icon: "🎆", desc: "Explosive audio sparks" }
+            { id: 1, name: "Energy Beat", icon: "⚡", desc: "Bass reaction" },
+            { id: 2, name: "Spectrum Flow", icon: "🌈", desc: "Full spectrum" },
+            { id: 3, name: "Rolling Wave", icon: "🌊", desc: "Color surge" },
+            { id: 4, name: "Stamp Rhythm", icon: "💥", desc: "Impact bursts" },
+            { id: 5, name: "Music Sync", icon: "🎵", desc: "Hardware mic" },
+            { id: 6, name: "Heartbeat", icon: "💓", desc: "Pulse breathing" },
+            { id: 7, name: "Gradient", icon: "🌟", desc: "Vibrant morph" },
+            { id: 8, name: "Firework", icon: "🎆", desc: "Audio sparks" }
         ];
 
-        // --- DOM HELPER UTILITIES ---
+        // --- DOM ELEMENTS ---
         const $ = id => document.getElementById(id);
         const $$ = sel => document.querySelectorAll(sel);
 
         const connectBtn = $('connectBtn');
         const powerBtn = $('powerBtn');
+        const voiceBtn = $('voiceBtn');
         const connStatusText = $('connStatusText');
         const sidebarStatusLight = $('sidebarStatusLight');
         const sidebarDeviceName = $('sidebarDeviceName');
         const liveColorDot = $('liveColorDot');
         const liveHexLabel = $('liveHexLabel');
         const pageTitle = $('pageTitle');
+        const voiceToast = $('voiceToast');
+        const voiceToastText = $('voiceToastText');
 
         const colorWheel = $('colorWheel');
         const ctx = colorWheel.getContext('2d');
@@ -1554,15 +1775,30 @@
         const speedSlider = $('speedSlider');
         const styleSpeedVal = $('styleSpeedVal');
 
-        const hwMusicGrid = $('hwMusicGrid');
-        const musicHwSpeed = $('musicHwSpeed');
+        // Screen Sync (Ambilight)
+        const screenVideo = $('screenVideo');
+        const screenPlaceholder = $('screenPlaceholder');
+        const ambilightStrip = $('ambilightStrip');
+        const toggleAmbilightBtn = $('toggleAmbilightBtn');
 
+        // MP3 Audio Player
+        const audioFileInput = $('audioFileInput');
+        const playAudioBtn = $('playAudioBtn');
+        const trackTitle = $('trackTitle');
+        const trackStatus = $('trackStatus');
+        const html5Audio = $('html5Audio');
+        const playerCanvas = $('playerCanvas');
+        const playerCtx = playerCanvas.getContext('2d');
+        const hwMusicGrid = $('hwMusicGrid');
+
+        // Mic Sync
         const musicSyncBtn = $('musicSyncBtn');
         const micSensitivitySlider = $('micSensitivity');
         const micSensVal = $('micSensVal');
         const visualizer = $('visualizer');
         const visCtx = visualizer.getContext('2d');
 
+        // Custom Sequence
         const seqTimeline = $('seqTimeline');
         const seqColorPicker = $('seqColorPicker');
         const addSeqColorBtn = $('addSeqColorBtn');
@@ -1570,20 +1806,26 @@
         const seqSpeedSlider = $('seqSpeedSlider');
         const playSeqBtn = $('playSeqBtn');
 
+        // Schedule & Scenes
         const timerStatusText = $('timerStatusText');
         const toggleSchedBtn = $('toggleSchedBtn');
         const schedStatusText = $('schedStatusText');
+        const sceneNameInput = $('sceneNameInput');
+        const saveSceneBtn = $('saveSceneBtn');
+        const savedScenesList = $('savedScenesList');
 
-        // --- INIT & BOOT ---
+        // --- INIT ---
         window.addEventListener('DOMContentLoaded', () => {
             drawColorWheel();
             populateModes('basic');
             populateHwMusic();
+            renderSavedScenes();
             bindAllEvents();
+            setupKeyboardShortcuts();
             window.addEventListener('resize', drawColorWheel);
         });
 
-        // --- BLE CORE PROTOCOL ---
+        // --- BLE PROTOCOL ---
         async function sendCommand(payload) {
             if (!writeChar) return;
             const now = Date.now();
@@ -1596,8 +1838,8 @@
                 } else {
                     await writeChar.writeValue(data);
                 }
-            } catch (err) {
-                console.error("BLE Write Error", err);
+            } catch (e) {
+                console.error("BLE error", e);
             }
         }
 
@@ -1640,8 +1882,7 @@
                     sidebarStatusLight.classList.add('connected');
                     sidebarDeviceName.textContent = name;
                     isPoweredOn = true;
-                } else {
-                    connStatusText.textContent = 'Char Error';
+                    showVoiceToast(`Connected to ${name}`);
                 }
             } catch (e) {
                 connStatusText.textContent = 'Pair Bluetooth';
@@ -1655,11 +1896,13 @@
             powerBtn.classList.remove('on');
             sidebarStatusLight.classList.remove('connected');
             sidebarDeviceName.textContent = 'No Device Paired';
+            stopAmbilight();
             stopMicSync();
             stopSequence();
+            showVoiceToast("Device Disconnected");
         }
 
-        // --- HARDWARE COMMAND WRAPPERS ---
+        // --- COMMANDS ---
         async function setPower(on) {
             const payload = on ?
                 [0x7E, 0x04, 0x04, 0xF0, 0x00, 0x01, 0xFF, 0x00, 0xEF] :
@@ -1668,6 +1911,7 @@
         }
 
         async function setColor(r, g, b) {
+            currentRGB = { r, g, b };
             await sendCommand([0x7E, 0x07, 0x05, 0x03, r, g, b, 0x10, 0xEF]);
             const rgbStr = `rgb(${r}, ${g}, ${b})`;
             const hex = '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
@@ -1679,8 +1923,10 @@
         }
 
         async function setBrightness(val) {
+            currentBrightness = val;
             await sendCommand([0x7E, 0x04, 0x01, val, 0x00, 0x00, 0x00, 0x00, 0xEF]);
             brightVal.textContent = `${val}%`;
+            brightnessSlider.value = val;
         }
 
         async function setCCT(warm, cool) {
@@ -1696,7 +1942,8 @@
             await sendCommand([0x7E, 0x07, 0x02, val, 0xFF, 0xFF, 0xFF, 0x00, 0xEF]);
         }
 
-        // --- NAVIGATION CONTROLLER ---
+        // --- NAVIGATION ---
+        const tabList = ['tab-adjust', 'tab-style', 'tab-screen', 'tab-music', 'tab-mic', 'tab-custom', 'tab-schedule'];
         function switchTab(tabId) {
             $$('.tab-pane').forEach(p => p.classList.remove('active'));
             $$('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -1713,234 +1960,277 @@
 
             const titles = {
                 'tab-adjust': 'Adjust Color',
-                'tab-style': '212 IC Modes',
-                'tab-music': 'Hardware Music Modes',
+                'tab-style': '212 IC Dynamic Modes',
+                'tab-screen': 'TV & Monitor Ambilight Sync',
+                'tab-music': 'Local MP3 Music Player',
                 'tab-mic': 'Microphone Sync',
                 'tab-custom': 'Custom Sequence Studio',
-                'tab-schedule': 'Timer & Schedule'
+                'tab-schedule': 'Saved Scenes & Timers'
             };
             pageTitle.textContent = titles[tabId] || 'Neon Sync';
         }
 
-        // --- UI EVENT BINDINGS ---
-        function bindAllEvents() {
-            // Tab Buttons (Desktop & Mobile)
-            $$('.nav-btn, .mob-nav-item').forEach(btn => {
-                btn.addEventListener('click', () => switchTab(btn.dataset.tab));
-            });
+        // --- TOAST NOTIFICATION ---
+        let toastTimeout;
+        function showVoiceToast(text) {
+            voiceToastText.textContent = text;
+            voiceToast.classList.add('show');
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => voiceToast.classList.remove('show'), 3000);
+        }
 
-            // Power Toggle
-            powerBtn.addEventListener('click', () => {
-                isPoweredOn = !isPoweredOn;
-                powerBtn.classList.toggle('on', isPoweredOn);
-                setPower(isPoweredOn);
-            });
+        // --- AI VOICE ASSISTANT ---
+        let recognition = null;
+        let isVoiceListening = false;
 
-            // Color Wheel Interaction
-            let isDragging = false;
-            colorWheel.addEventListener('mousedown', e => { isDragging = true; sampleWheel(e); });
-            colorWheel.addEventListener('mousemove', e => { if (isDragging) sampleWheel(e); });
-            window.addEventListener('mouseup', () => { isDragging = false; });
-            colorWheel.addEventListener('touchstart', e => { isDragging = true; sampleWheel(e.touches[0]); }, { passive: true });
-            colorWheel.addEventListener('touchmove', e => { if (isDragging) { e.preventDefault(); sampleWheel(e.touches[0]); } }, { passive: false });
-            window.addEventListener('touchend', () => { isDragging = false; });
+        function initVoiceAssistant() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                alert('Speech recognition is not supported in this browser. Please use Chrome or Edge.');
+                return;
+            }
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.lang = 'en-US';
+            recognition.interimResults = false;
 
-            // RGB Inputs
-            [inputR, inputG, inputB].forEach(input => {
-                input.addEventListener('change', () => {
-                    setColor(
-                        Math.max(0, Math.min(255, +inputR.value)),
-                        Math.max(0, Math.min(255, +inputG.value)),
-                        Math.max(0, Math.min(255, +inputB.value))
-                    );
-                });
-            });
+            recognition.onstart = () => {
+                isVoiceListening = true;
+                voiceBtn.classList.add('listening');
+                showVoiceToast("Listening... (Speak command)");
+            };
 
-            // Brightness Slider
-            brightnessSlider.addEventListener('input', e => setBrightness(+e.target.value));
+            recognition.onresult = (event) => {
+                const text = event.results[0][0].transcript.toLowerCase().trim();
+                handleVoiceCommand(text);
+            };
 
-            // CCT Slider
-            cctSlider.addEventListener('input', e => {
-                const v = +e.target.value;
-                cctVal.textContent = `${v}%`;
-                setCCT(100 - v, v);
-            });
+            recognition.onerror = (e) => {
+                isVoiceListening = false;
+                voiceBtn.classList.remove('listening');
+                showVoiceToast("Voice command error");
+            };
 
-            // Preset Chips
-            $$('.palette-chip[data-r]').forEach(btn => {
-                btn.addEventListener('click', () => setColor(+btn.dataset.r, +btn.dataset.g, +btn.dataset.b));
-            });
+            recognition.onend = () => {
+                isVoiceListening = false;
+                voiceBtn.classList.remove('listening');
+            };
+        }
 
-            if (cctPresetBtn) {
-                cctPresetBtn.addEventListener('click', () => {
-                    cctSlider.value = 50;
-                    cctVal.textContent = '50%';
-                    setCCT(50, 50);
-                });
+        function toggleVoice() {
+            if (!recognition) initVoiceAssistant();
+            if (!recognition) return;
+            if (isVoiceListening) {
+                recognition.stop();
+            } else {
+                recognition.start();
+            }
+        }
+
+        function handleVoiceCommand(cmd) {
+            showVoiceToast(`Heard: "${cmd}"`);
+
+            if (cmd.includes('turn on') || cmd.includes('lights on') || cmd.includes('power on')) {
+                isPoweredOn = true; powerBtn.classList.add('on'); setPower(true);
+            } else if (cmd.includes('turn off') || cmd.includes('lights off') || cmd.includes('power off')) {
+                isPoweredOn = false; powerBtn.classList.remove('on'); setPower(false);
+            } else if (cmd.includes('red')) { setColor(255, 0, 0); }
+            else if (cmd.includes('green')) { setColor(0, 255, 0); }
+            else if (cmd.includes('blue')) { setColor(0, 100, 255); }
+            else if (cmd.includes('yellow')) { setColor(255, 255, 0); }
+            else if (cmd.includes('cyan') || cmd.includes('teal')) { setColor(0, 255, 255); }
+            else if (cmd.includes('purple') || cmd.includes('violet') || cmd.includes('magenta')) { setColor(255, 0, 255); }
+            else if (cmd.includes('orange')) { setColor(255, 120, 0); }
+            else if (cmd.includes('pink')) { setColor(255, 0, 128); }
+            else if (cmd.includes('warm white')) { setCCT(100, 0); }
+            else if (cmd.includes('cool white') || cmd.includes('white')) { setColor(255, 255, 255); }
+            else if (cmd.includes('dim') || cmd.includes('low')) { setBrightness(25); }
+            else if (cmd.includes('half')) { setBrightness(50); }
+            else if (cmd.includes('bright') || cmd.includes('maximum') || cmd.includes('100%')) { setBrightness(100); }
+            else if (cmd.includes('party') || cmd.includes('rainbow')) { setMode(4); }
+            else if (cmd.includes('strobe')) { setMode(18); }
+            else if (cmd.includes('flow')) { setMode(26); }
+        }
+
+        // --- SCREEN SYNC (AMBILIGHT) ---
+        let screenStream = null;
+        let isAmbilightActive = false;
+        let ambilightRafId = null;
+        const offscreenCanvas = document.createElement('canvas');
+        const offscreenCtx = offscreenCanvas.getContext('2d', { willReadFrequently: true });
+        offscreenCanvas.width = 64;
+        offscreenCanvas.height = 36;
+
+        async function toggleAmbilight() {
+            if (isAmbilightActive) {
+                stopAmbilight();
+            } else {
+                try {
+                    screenStream = await navigator.mediaDevices.getDisplayMedia({
+                        video: { cursor: "never" },
+                        audio: false
+                    });
+                    screenVideo.srcObject = screenStream;
+                    screenVideo.style.display = 'block';
+                    screenPlaceholder.style.display = 'none';
+                    isAmbilightActive = true;
+                    toggleAmbilightBtn.textContent = 'Stop Screen Sync';
+                    toggleAmbilightBtn.classList.replace('btn-primary', 'btn-danger-outline');
+
+                    screenStream.getVideoTracks()[0].onended = () => stopAmbilight();
+                    tickAmbilight();
+                    showVoiceToast("Screen Ambilight Active");
+                } catch (e) {
+                    console.log("Ambilight cancelled", e);
+                }
+            }
+        }
+
+        function stopAmbilight() {
+            isAmbilightActive = false;
+            if (screenStream) {
+                screenStream.getTracks().forEach(t => t.stop());
+                screenStream = null;
+            }
+            screenVideo.style.display = 'none';
+            screenPlaceholder.style.display = 'flex';
+            toggleAmbilightBtn.textContent = 'Start Screen Sync';
+            toggleAmbilightBtn.classList.replace('btn-danger-outline', 'btn-primary');
+            cancelAnimationFrame(ambilightRafId);
+        }
+
+        let smoothedR = 255, smoothedG = 0, smoothedB = 255;
+        function tickAmbilight() {
+            if (!isAmbilightActive) return;
+            ambilightRafId = requestAnimationFrame(tickAmbilight);
+
+            if (screenVideo.readyState === screenVideo.HAVE_ENOUGH_DATA) {
+                offscreenCtx.drawImage(screenVideo, 0, 0, offscreenCanvas.width, offscreenCanvas.height);
+                const imgData = offscreenCtx.getImageData(0, 0, offscreenCanvas.width, offscreenCanvas.height).data;
+
+                let rSum = 0, gSum = 0, bSum = 0, count = 0;
+                for (let i = 0; i < imgData.length; i += 16) {
+                    rSum += imgData[i];
+                    gSum += imgData[i + 1];
+                    bSum += imgData[i + 2];
+                    count++;
+                }
+
+                let targetR = Math.round(rSum / count);
+                let targetG = Math.round(gSum / count);
+                let targetB = Math.round(bSum / count);
+
+                // Smooth color transition
+                smoothedR += (targetR - smoothedR) * 0.3;
+                smoothedG += (targetG - smoothedG) * 0.3;
+                smoothedB += (targetB - smoothedB) * 0.3;
+
+                const r = Math.round(smoothedR);
+                const g = Math.round(smoothedG);
+                const b = Math.round(smoothedB);
+
+                ambilightStrip.style.background = `rgb(${r}, ${g}, ${b})`;
+                ambilightStrip.style.boxShadow = `0 0 25px rgba(${r}, ${g}, ${b}, 0.6)`;
+
+                if (Date.now() - lastSentTime > 60 && writeChar) {
+                    setColor(r, g, b);
+                }
+            }
+        }
+
+        // --- MP3 LOCAL AUDIO PLAYER ---
+        let playerAudioCtx, playerAnalyser, playerSource;
+        let isAudioPlaying = false;
+        let playerRafId;
+
+        audioFileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const url = URL.createObjectURL(file);
+            html5Audio.src = url;
+            trackTitle.textContent = file.name;
+            trackStatus.textContent = 'Ready to play';
+            playAudioBtn.textContent = '▶';
+            isAudioPlaying = false;
+        });
+
+        playAudioBtn.addEventListener('click', () => {
+            if (!html5Audio.src) {
+                audioFileInput.click();
+                return;
+            }
+            if (isAudioPlaying) {
+                html5Audio.pause();
+                playAudioBtn.textContent = '▶';
+                isAudioPlaying = false;
+                trackStatus.textContent = 'Paused';
+            } else {
+                if (!playerAudioCtx) {
+                    playerAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    playerAnalyser = playerAudioCtx.createAnalyser();
+                    playerAnalyser.fftSize = 256;
+                    playerSource = playerAudioCtx.createMediaElementSource(html5Audio);
+                    playerSource.connect(playerAnalyser);
+                    playerAnalyser.connect(playerAudioCtx.destination);
+                }
+                html5Audio.play();
+                playAudioBtn.textContent = '⏸';
+                isAudioPlaying = true;
+                trackStatus.textContent = 'Playing & Syncing';
+                tickPlayerVisualizer();
+            }
+        });
+
+        function tickPlayerVisualizer() {
+            if (!isAudioPlaying) return;
+            playerRafId = requestAnimationFrame(tickPlayerVisualizer);
+
+            const data = new Uint8Array(playerAnalyser.frequencyBinCount);
+            playerAnalyser.getByteFrequencyData(data);
+
+            playerCtx.clearRect(0, 0, playerCanvas.width, playerCanvas.height);
+            const barW = playerCanvas.width / data.length * 2.5;
+            let x = 0, bass = 0, total = 0;
+
+            for (let i = 0; i < data.length; i++) {
+                const bh = data[i] * 0.45;
+                const hue = (i / data.length) * 260 + 120;
+                playerCtx.fillStyle = `hsl(${hue}, 90%, ${45 + bh * 0.2}%)`;
+                playerCtx.fillRect(x, playerCanvas.height - bh, barW, bh);
+                x += barW + 1;
+                total += data[i];
+                if (i < 12) bass += data[i];
             }
 
-            // Style Sub-tabs
-            $$('.cat-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    $$('.cat-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    populateModes(btn.dataset.filter);
-                });
-            });
-
-            // Style Speed Slider
-            speedSlider.addEventListener('input', e => {
-                styleSpeedVal.textContent = e.target.value;
-                setSpeed(+e.target.value);
-            });
-
-            // Hardware Music Speed
-            musicHwSpeed.addEventListener('input', e => setSpeed(+e.target.value));
-
-            // Mic Sensitivity Slider
-            micSensitivitySlider.addEventListener('input', e => {
-                micSensitivity = +e.target.value;
-                micSensVal.textContent = micSensitivity;
-            });
-
-            // Mic Model Buttons
-            $$('.model-chip').forEach(chip => {
-                chip.addEventListener('click', () => {
-                    $$('.model-chip').forEach(c => c.classList.remove('active'));
-                    chip.classList.add('active');
-                    currentMusicModel = parseInt(chip.dataset.model);
-                });
-            });
-
-            // Mic Start/Stop
-            musicSyncBtn.addEventListener('click', () => {
-                if (isMicActive) stopMicSync();
-                else startMicSync();
-            });
-
-            // Custom Sequence Controls
-            addSeqColorBtn.addEventListener('click', addTimelineColor);
-            clearSeqBtn.addEventListener('click', () => {
-                timelineColors = [];
-                renderTimeline();
-                stopSequence();
-            });
-            playSeqBtn.addEventListener('click', () => {
-                if (isSequencePlaying) stopSequence();
-                else playSequence();
-            });
-
-            $$('.trans-mode-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    $$('.trans-mode-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    transMode = btn.dataset.trans;
-                    if (isSequencePlaying) { stopSequence(); playSequence(); }
-                });
-            });
-
-            // Sleep Timer Buttons
-            $$('.btn-timer').forEach(btn => {
-                btn.addEventListener('click', () => setSleepTimer(+btn.dataset.mins));
-            });
-
-            // Daily Schedule Toggle
-            toggleSchedBtn.addEventListener('click', toggleDailySchedule);
-        }
-
-        // --- COLOR WHEEL RENDERING ---
-        function drawColorWheel() {
-            const size = colorWheel.width;
-            const r = size / 2;
-            for (let a = 0; a < 360; a++) {
-                ctx.beginPath();
-                ctx.moveTo(r, r);
-                ctx.arc(r, r, r, (a - 1) * Math.PI / 180, a * Math.PI / 180);
-                ctx.closePath();
-                ctx.fillStyle = `hsl(${a}, 100%, 50%)`;
-                ctx.fill();
+            if (Date.now() - lastSentTime > 100 && writeChar) {
+                const avgBass = Math.min(255, Math.floor(bass / 12 * 1.6));
+                if (avgBass > 50) {
+                    const rgb = hslToRgb((Date.now() % 3000) / 3000, 1, Math.max(50, avgBass) / 255);
+                    setColor(rgb[0], rgb[1], rgb[2]);
+                }
             }
-            const grad = ctx.createRadialGradient(r, r, 0, r, r, r);
-            grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
-            grad.addColorStop(0.35, 'rgba(255, 255, 255, 0)');
-            ctx.fillStyle = grad;
-            ctx.fillRect(0, 0, size, size);
         }
 
-        function sampleWheel(e) {
-            const rect = colorWheel.getBoundingClientRect();
-            const sx = colorWheel.width / rect.width;
-            const sy = colorWheel.height / rect.height;
-            if (e.clientX === undefined) return;
-            let x = (e.clientX - rect.left) * sx;
-            let y = (e.clientY - rect.top) * sy;
-            const r = colorWheel.width / 2;
-            const dx = x - r, dy = y - r;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            if (dist > r) { x = r + (dx * r / dist); y = r + (dy * r / dist); }
-            const p = ctx.getImageData(Math.round(x), Math.round(y), 1, 1).data;
-            setColor(p[0], p[1], p[2]);
-        }
-
-        // --- POPULATE 212 MODES ---
-        function populateModes(category) {
-            modesList.innerHTML = '';
-            MODES.filter(m => m.category === category).forEach(m => {
-                const div = document.createElement('div');
-                div.className = 'mode-tile' + (currentMode === m.id ? ' active' : '');
-                div.innerHTML = `
-                    <span class="mode-tile-num">${m.id}</span>
-                    <span class="mode-tile-name">${m.name}</span>
-                `;
-                div.addEventListener('click', () => {
-                    $$('.mode-tile').forEach(t => t.classList.remove('active'));
-                    div.classList.add('active');
-                    setMode(m.id);
-                });
-                modesList.appendChild(div);
-            });
-        }
-
-        // --- POPULATE HW MUSIC MODES ---
-        function populateHwMusic() {
-            hwMusicGrid.innerHTML = '';
-            HW_MUSIC_MODES.forEach(m => {
-                const card = document.createElement('div');
-                card.className = 'hw-music-card';
-                card.innerHTML = `
-                    <span class="hw-music-icon">${m.icon}</span>
-                    <span class="hw-music-name">${m.name}</span>
-                    <span class="hw-music-desc">${m.desc}</span>
-                `;
-                card.addEventListener('click', () => {
-                    $$('.hw-music-card').forEach(c => c.classList.remove('active'));
-                    card.classList.add('active');
-                    setMode(m.id);
-                });
-                hwMusicGrid.appendChild(card);
-            });
-        }
-
-        // --- MICROPHONE AUDIO ANALYSIS ---
-        let audioCtx, analyser, source, rafId;
+        // --- MICROPHONE SYNC ---
+        let micAudioCtx, micAnalyser, micSource, micRafId;
         let isMicActive = false;
-        let hueShift = 0;
+        let micHueShift = 0;
 
         async function startMicSync() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                analyser = audioCtx.createAnalyser();
-                source = audioCtx.createMediaStreamSource(stream);
-                source.connect(analyser);
-                analyser.fftSize = 256;
+                micAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                micAnalyser = micAudioCtx.createAnalyser();
+                micSource = micAudioCtx.createMediaStreamSource(stream);
+                micSource.connect(micAnalyser);
+                micAnalyser.fftSize = 256;
                 isMicActive = true;
                 stopSequence();
                 musicSyncBtn.textContent = 'Stop Listening';
                 musicSyncBtn.classList.replace('btn-primary', 'btn-outline');
                 tickMicVisualizer();
             } catch (err) {
-                alert('Microphone access was denied or not supported.');
+                alert('Microphone access denied or not supported.');
             }
         }
 
@@ -1948,16 +2238,16 @@
             isMicActive = false;
             musicSyncBtn.textContent = 'Start Listening';
             musicSyncBtn.classList.replace('btn-outline', 'btn-primary');
-            cancelAnimationFrame(rafId);
-            if (audioCtx) audioCtx.close();
+            cancelAnimationFrame(micRafId);
+            if (micAudioCtx) micAudioCtx.close();
             visCtx.clearRect(0, 0, visualizer.width, visualizer.height);
         }
 
         function tickMicVisualizer() {
             if (!isMicActive) return;
-            rafId = requestAnimationFrame(tickMicVisualizer);
-            const data = new Uint8Array(analyser.frequencyBinCount);
-            analyser.getByteFrequencyData(data);
+            micRafId = requestAnimationFrame(tickMicVisualizer);
+            const data = new Uint8Array(micAnalyser.frequencyBinCount);
+            micAnalyser.getByteFrequencyData(data);
 
             visCtx.clearRect(0, 0, visualizer.width, visualizer.height);
             const barW = visualizer.width / data.length * 2.5;
@@ -1985,34 +2275,26 @@
 
                 let r = 0, g = 0, b = 0;
                 switch (currentMusicModel) {
-                    case 1: // Classic Beat
-                        if (aB > 45) { r = aB; g = Math.max(0, aB - 100); b = 255 - aB; }
+                    case 1: if (aB > 45) { r = aB; g = Math.max(0, aB - 100); b = 255 - aB; } break;
+                    case 2: r = aB > 35 ? aB : 0; g = aM > 35 ? aM : 0; b = aT > 35 ? aT : 0; break;
+                    case 3:
+                        micHueShift = (micHueShift + aB / 10) % 360;
+                        if (aB > 25) { const rgb = hslToRgb(micHueShift / 360, 1, Math.max(50, aB) / 255); r = rgb[0]; g = rgb[1]; b = rgb[2]; }
                         break;
-                    case 2: // Dynamic RGB
-                        r = aB > 35 ? aB : 0; g = aM > 35 ? aM : 0; b = aT > 35 ? aT : 0;
+                    case 4: if (aB > 175 || aT > 145) { r = g = b = 255; } break;
+                    case 5:
+                        micHueShift = (micHueShift + 2) % 360;
+                        if (aE > 18) { const rgb = hslToRgb(micHueShift / 360, 1, aE / 255); r = rgb[0]; g = rgb[1]; b = rgb[2]; }
                         break;
-                    case 3: // Rainbow Flow
-                        hueShift = (hueShift + aB / 10) % 360;
-                        if (aB > 25) { const rgb = hslToRgb(hueShift / 360, 1, Math.max(50, aB) / 255); r = rgb[0]; g = rgb[1]; b = rgb[2]; }
-                        break;
-                    case 4: // Strobe Beat
-                        if (aB > 175 || aT > 145) { r = g = b = 255; }
-                        break;
-                    case 5: // Energy Pulse
-                        hueShift = (hueShift + 2) % 360;
-                        if (aE > 18) { const rgb = hslToRgb(hueShift / 360, 1, aE / 255); r = rgb[0]; g = rgb[1]; b = rgb[2]; }
-                        break;
-                    case 6: // Bass Drop
+                    case 6:
                         if (aB > 165) { const rgb = hslToRgb(Math.random(), 1, 0.5); r = rgb[0]; g = rgb[1]; b = rgb[2]; }
                         else { b = 45; }
                         break;
-                    case 7: // Vocal React
-                        if (aM > 55) { r = aM; g = 255 - aM; b = aT; }
-                        break;
-                    case 8: // Chill Wave
-                        hueShift = (hueShift + 0.4) % 360;
+                    case 7: if (aM > 55) { r = aM; g = 255 - aM; b = aT; } break;
+                    case 8:
+                        micHueShift = (micHueShift + 0.4) % 360;
                         const bright = aE > 10 ? Math.max(30, aE * 0.7) : 0;
-                        if (bright > 0) { const rgb = hslToRgb(hueShift / 360, 0.7, bright / 255); r = rgb[0]; g = rgb[1]; b = rgb[2]; }
+                        if (bright > 0) { const rgb = hslToRgb(micHueShift / 360, 0.7, bright / 255); r = rgb[0]; g = rgb[1]; b = rgb[2]; }
                         break;
                 }
 
@@ -2022,7 +2304,62 @@
             }
         }
 
-        // --- CUSTOM SEQUENCES ---
+        // --- SAVED CUSTOM SCENES (localStorage) ---
+        function getSavedScenes() {
+            try {
+                return JSON.parse(localStorage.getItem('neon_sync_scenes')) || [
+                    { name: "Cyberpunk Glow", r: 0, g: 255, b: 240, brightness: 100 },
+                    { name: "Cozy Warm", r: 255, g: 140, b: 20, brightness: 60 },
+                    { name: "Gaming Pulse", r: 255, g: 0, b: 80, brightness: 100 }
+                ];
+            } catch (e) { return []; }
+        }
+
+        function saveCurrentScene() {
+            const name = sceneNameInput.value.trim() || `Scene ${Date.now().toString().slice(-4)}`;
+            const scenes = getSavedScenes();
+            scenes.push({
+                name,
+                r: currentRGB.r,
+                g: currentRGB.g,
+                b: currentRGB.b,
+                brightness: currentBrightness
+            });
+            localStorage.setItem('neon_sync_scenes', JSON.stringify(scenes));
+            sceneNameInput.value = '';
+            renderSavedScenes();
+            showVoiceToast(`Saved scene "${name}"`);
+        }
+
+        function renderSavedScenes() {
+            const scenes = getSavedScenes();
+            savedScenesList.innerHTML = '';
+            scenes.forEach((s, idx) => {
+                const card = document.createElement('div');
+                card.className = 'scene-card';
+                card.innerHTML = `
+                    <div class="scene-card-info" data-idx="${idx}">
+                        <div class="scene-dot" style="background:rgb(${s.r},${s.g},${s.b})"></div>
+                        <span class="scene-name">${s.name}</span>
+                    </div>
+                    <button class="btn-scene-del" data-del="${idx}">✕</button>
+                `;
+                card.querySelector('.scene-card-info').addEventListener('click', () => {
+                    setColor(s.r, s.g, s.b);
+                    setBrightness(s.brightness || 100);
+                    showVoiceToast(`Applied "${s.name}"`);
+                });
+                card.querySelector('.btn-scene-del').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    scenes.splice(idx, 1);
+                    localStorage.setItem('neon_sync_scenes', JSON.stringify(scenes));
+                    renderSavedScenes();
+                });
+                savedScenesList.appendChild(card);
+            });
+        }
+
+        // --- CUSTOM TIMELINE SEQUENCER ---
         let timelineColors = [];
         let seqInterval = null, seqRaf = null, seqIndex = 0;
         let isSequencePlaying = false;
@@ -2040,7 +2377,7 @@
         function renderTimeline() {
             seqTimeline.innerHTML = '';
             if (timelineColors.length === 0) {
-                seqTimeline.innerHTML = '<span style="color:var(--text-muted); font-size:0.8rem;">Click + Add Color to build your animation sequence</span>';
+                seqTimeline.innerHTML = '<span style="color:var(--text-muted); font-size:0.8rem;">Click + Add Step to build your custom sequence</span>';
                 return;
             }
             timelineColors.forEach((c, idx) => {
@@ -2048,7 +2385,7 @@
                 block.className = 'timeline-block';
                 block.style.background = c.hex;
                 block.id = `tblock-${idx}`;
-                block.title = 'Click to remove';
+                block.title = 'Click to delete';
                 block.addEventListener('click', () => {
                     timelineColors.splice(idx, 1);
                     renderTimeline();
@@ -2070,6 +2407,7 @@
         function playSequence() {
             if (timelineColors.length === 0) return;
             stopMicSync();
+            stopAmbilight();
             isSequencePlaying = true;
             playSeqBtn.textContent = 'Stop Sequence';
             playSeqBtn.classList.replace('btn-primary', 'btn-outline');
@@ -2126,20 +2464,216 @@
             seqRaf = requestAnimationFrame(fadeLoop);
         }
 
-        // --- TIMER & SCHEDULE ---
+        // --- KEYBOARD SHORTCUTS ---
+        function setupKeyboardShortcuts() {
+            window.addEventListener('keydown', (e) => {
+                // Ignore inside text inputs
+                if (['INPUT', 'TEXTAREA'].includes(e.target.tagName)) return;
+
+                if (e.code === 'Space') {
+                    e.preventDefault();
+                    isPoweredOn = !isPoweredOn;
+                    powerBtn.classList.toggle('on', isPoweredOn);
+                    setPower(isPoweredOn);
+                    showVoiceToast(isPoweredOn ? 'Lights On' : 'Lights Off');
+                } else if (e.key >= '1' && e.key <= '7') {
+                    const idx = parseInt(e.key) - 1;
+                    if (tabList[idx]) switchTab(tabList[idx]);
+                } else if (e.code === 'ArrowUp') {
+                    e.preventDefault();
+                    setBrightness(Math.min(100, currentBrightness + 10));
+                } else if (e.code === 'ArrowDown') {
+                    e.preventDefault();
+                    setBrightness(Math.max(0, currentBrightness - 10));
+                } else if (e.key.toLowerCase() === 'v') {
+                    toggleVoice();
+                } else if (e.key.toLowerCase() === 'm') {
+                    stopMicSync();
+                    stopAmbilight();
+                    if (isAudioPlaying) html5Audio.pause();
+                    showVoiceToast('All Audio Sync Stopped');
+                }
+            });
+        }
+
+        // --- EVENT BINDINGS ---
+        function bindAllEvents() {
+            // Tabs
+            $$('.nav-btn, .mob-nav-item').forEach(btn => {
+                btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+            });
+
+            // Voice Assistant
+            voiceBtn.addEventListener('click', toggleVoice);
+
+            // Power
+            powerBtn.addEventListener('click', () => {
+                isPoweredOn = !isPoweredOn;
+                powerBtn.classList.toggle('on', isPoweredOn);
+                setPower(isPoweredOn);
+            });
+
+            // Color Wheel
+            let isDragging = false;
+            colorWheel.addEventListener('mousedown', e => { isDragging = true; sampleWheel(e); });
+            colorWheel.addEventListener('mousemove', e => { if (isDragging) sampleWheel(e); });
+            window.addEventListener('mouseup', () => { isDragging = false; });
+            colorWheel.addEventListener('touchstart', e => { isDragging = true; sampleWheel(e.touches[0]); }, { passive: true });
+            colorWheel.addEventListener('touchmove', e => { if (isDragging) { e.preventDefault(); sampleWheel(e.touches[0]); } }, { passive: false });
+            window.addEventListener('touchend', () => { isDragging = false; });
+
+            // RGB inputs
+            [inputR, inputG, inputB].forEach(inp => {
+                inp.addEventListener('change', () => setColor(
+                    Math.max(0, Math.min(255, +inputR.value)),
+                    Math.max(0, Math.min(255, +inputG.value)),
+                    Math.max(0, Math.min(255, +inputB.value))
+                ));
+            });
+
+            // Sliders
+            brightnessSlider.addEventListener('input', e => setBrightness(+e.target.value));
+            cctSlider.addEventListener('input', e => {
+                const v = +e.target.value;
+                cctVal.textContent = `${v}%`;
+                setCCT(100 - v, v);
+            });
+
+            // Palette chips
+            $$('.palette-chip[data-r]').forEach(btn => {
+                btn.addEventListener('click', () => setColor(+btn.dataset.r, +btn.dataset.g, +btn.dataset.b));
+            });
+            if (cctPresetBtn) {
+                cctPresetBtn.addEventListener('click', () => {
+                    cctSlider.value = 50; cctVal.textContent = '50%'; setCCT(50, 50);
+                });
+            }
+
+            // Style Sub-tabs
+            $$('.cat-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    $$('.cat-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    populateModes(btn.dataset.filter);
+                });
+            });
+            speedSlider.addEventListener('input', e => {
+                styleSpeedVal.textContent = e.target.value;
+                setSpeed(+e.target.value);
+            });
+
+            // Ambilight
+            toggleAmbilightBtn.addEventListener('click', toggleAmbilight);
+
+            // Mic
+            micSensitivitySlider.addEventListener('input', e => {
+                micSensitivity = +e.target.value;
+                micSensVal.textContent = micSensitivity;
+            });
+            $$('.model-chip').forEach(chip => {
+                chip.addEventListener('click', () => {
+                    $$('.model-chip').forEach(c => c.classList.remove('active'));
+                    chip.classList.add('active');
+                    currentMusicModel = parseInt(chip.dataset.model);
+                });
+            });
+            musicSyncBtn.addEventListener('click', () => {
+                isMicActive ? stopMicSync() : startMicSync();
+            });
+
+            // Custom Sequence
+            addSeqColorBtn.addEventListener('click', addTimelineColor);
+            clearSeqBtn.addEventListener('click', () => { timelineColors = []; renderTimeline(); stopSequence(); });
+            playSeqBtn.addEventListener('click', () => { isSequencePlaying ? stopSequence() : playSequence(); });
+            $$('.trans-mode-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    $$('.trans-mode-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    transMode = btn.dataset.trans;
+                    if (isSequencePlaying) { stopSequence(); playSequence(); }
+                });
+            });
+
+            // Saved Scenes
+            saveSceneBtn.addEventListener('click', saveCurrentScene);
+
+            // Timers & Sched
+            $$('.btn-timer').forEach(btn => btn.addEventListener('click', () => setSleepTimer(+btn.dataset.mins)));
+            toggleSchedBtn.addEventListener('click', toggleDailySchedule);
+        }
+
+        // --- DRAW COLOR WHEEL ---
+        function drawColorWheel() {
+            const size = colorWheel.width;
+            const r = size / 2;
+            for (let a = 0; a < 360; a++) {
+                ctx.beginPath();
+                ctx.moveTo(r, r);
+                ctx.arc(r, r, r, (a - 1) * Math.PI / 180, a * Math.PI / 180);
+                ctx.closePath();
+                ctx.fillStyle = `hsl(${a}, 100%, 50%)`;
+                ctx.fill();
+            }
+            const grad = ctx.createRadialGradient(r, r, 0, r, r, r);
+            grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+            grad.addColorStop(0.35, 'rgba(255, 255, 255, 0)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, size, size);
+        }
+
+        function sampleWheel(e) {
+            const rect = colorWheel.getBoundingClientRect();
+            const sx = colorWheel.width / rect.width;
+            const sy = colorWheel.height / rect.height;
+            if (e.clientX === undefined) return;
+            let x = (e.clientX - rect.left) * sx;
+            let y = (e.clientY - rect.top) * sy;
+            const r = colorWheel.width / 2;
+            const dx = x - r, dy = y - r, dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist > r) { x = r + (dx * r / dist); y = r + (dy * r / dist); }
+            const p = ctx.getImageData(Math.round(x), Math.round(y), 1, 1).data;
+            setColor(p[0], p[1], p[2]);
+        }
+
+        function populateModes(cat) {
+            modesList.innerHTML = '';
+            MODES.filter(m => m.category === cat).forEach(m => {
+                const div = document.createElement('div');
+                div.className = 'mode-tile' + (currentMode === m.id ? ' active' : '');
+                div.innerHTML = `<span class="mode-tile-num">${m.id}</span><span class="mode-tile-name">${m.name}</span>`;
+                div.addEventListener('click', () => {
+                    $$('.mode-tile').forEach(t => t.classList.remove('active'));
+                    div.classList.add('active');
+                    setMode(m.id);
+                });
+                modesList.appendChild(div);
+            });
+        }
+
+        function populateHwMusic() {
+            hwMusicGrid.innerHTML = '';
+            HW_MUSIC_MODES.forEach(m => {
+                const card = document.createElement('div');
+                card.className = 'hw-music-card';
+                card.innerHTML = `<span class="hw-music-icon">${m.icon}</span><span class="hw-music-name">${m.name}</span><span class="hw-music-desc">${m.desc}</span>`;
+                card.addEventListener('click', () => {
+                    $$('.hw-music-card').forEach(c => c.classList.remove('active'));
+                    card.classList.add('active');
+                    setMode(m.id);
+                });
+                hwMusicGrid.appendChild(card);
+            });
+        }
+
+        // --- SLEEP TIMER & SCHEDULE ---
         let sleepTimerId;
         function setSleepTimer(mins) {
             clearTimeout(sleepTimerId);
-            if (mins === 0) {
-                timerStatusText.textContent = "Timer cancelled.";
-                return;
-            }
-            timerStatusText.textContent = `Lights will turn off in ${mins} min.`;
+            if (mins === 0) { timerStatusText.textContent = "Timer cancelled."; return; }
+            timerStatusText.textContent = `Lights off in ${mins} min`;
             sleepTimerId = setTimeout(() => {
-                setPower(false);
-                isPoweredOn = false;
-                powerBtn.classList.remove('on');
-                timerStatusText.textContent = "Timer finished. Lights turned off.";
+                setPower(false); isPoweredOn = false; powerBtn.classList.remove('on');
+                timerStatusText.textContent = "Timer finished. Lights off.";
             }, mins * 60000);
         }
 
@@ -2163,15 +2697,10 @@
             const curHM = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
             const onTime = $('schedOnTime').value;
             const offTime = $('schedOffTime').value;
-            if (curHM === onTime && !isPoweredOn) {
-                setPower(true); isPoweredOn = true; powerBtn.classList.add('on');
-            }
-            if (curHM === offTime && isPoweredOn) {
-                setPower(false); isPoweredOn = false; powerBtn.classList.remove('on');
-            }
+            if (curHM === onTime && !isPoweredOn) { setPower(true); isPoweredOn = true; powerBtn.classList.add('on'); }
+            if (curHM === offTime && isPoweredOn) { setPower(false); isPoweredOn = false; powerBtn.classList.remove('on'); }
         }
 
-        // --- MATH HELPERS ---
         function hslToRgb(h, s, l) {
             let r, g, b;
             if (s === 0) { r = g = b = l; } else {
