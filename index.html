@@ -1991,7 +1991,7 @@
         }
 
         // --- MP3 AUDIO PLAYER ---
-        let playerAudioCtx, playerAnalyser, playerSource, playerRafId, isAudioPlaying = false;
+        let playerAudioCtx, playerAnalyser, playerSource, playerRafId, isAudioPlaying = false, playerHueShift = 0;
         audioFileInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
@@ -2002,13 +2002,32 @@
             isAudioPlaying = false;
         });
 
-        playAudioBtn.addEventListener('click', () => {
+        html5Audio.addEventListener('play', () => {
+            isAudioPlaying = true;
+            playAudioBtn.textContent = '⏸';
+            trackStatus.textContent = 'Playing & Syncing';
+            if (playerAudioCtx && playerAudioCtx.state === 'suspended') playerAudioCtx.resume();
+            tickPlayerVisualizer();
+        });
+
+        html5Audio.addEventListener('pause', () => {
+            isAudioPlaying = false;
+            playAudioBtn.textContent = '▶';
+            trackStatus.textContent = html5Audio.currentTime > 0 && html5Audio.currentTime < html5Audio.duration ? 'Paused' : 'Ready to play';
+            cancelAnimationFrame(playerRafId);
+        });
+
+        html5Audio.addEventListener('ended', () => {
+            isAudioPlaying = false;
+            playAudioBtn.textContent = '▶';
+            trackStatus.textContent = 'Playback finished';
+            cancelAnimationFrame(playerRafId);
+        });
+
+        playAudioBtn.addEventListener('click', async () => {
             if (!html5Audio.src) { audioFileInput.click(); return; }
             if (isAudioPlaying) {
                 html5Audio.pause();
-                playAudioBtn.textContent = '▶';
-                isAudioPlaying = false;
-                trackStatus.textContent = 'Paused';
             } else {
                 if (!playerAudioCtx) {
                     playerAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -2018,11 +2037,8 @@
                     playerSource.connect(playerAnalyser);
                     playerAnalyser.connect(playerAudioCtx.destination);
                 }
-                html5Audio.play();
-                playAudioBtn.textContent = '⏸';
-                isAudioPlaying = true;
-                trackStatus.textContent = 'Playing & Syncing';
-                tickPlayerVisualizer();
+                if (playerAudioCtx.state === 'suspended') await playerAudioCtx.resume();
+                try { await html5Audio.play(); } catch (err) { trackStatus.textContent = 'Playback blocked by browser'; }
             }
         });
 
@@ -2033,29 +2049,60 @@
             playerAnalyser.getByteFrequencyData(data);
             playerCtx.clearRect(0, 0, playerCanvas.width, playerCanvas.height);
             const barW = playerCanvas.width / data.length * 2.5;
-            let x = 0, bass = 0;
+            let x = 0, bass = 0, mid = 0, treble = 0, totalEnergy = 0;
             for (let i = 0; i < data.length; i++) {
                 const bh = data[i] * 0.4;
                 playerCtx.fillStyle = `hsl(${(i / data.length) * 260 + 120}, 90%, ${45 + bh * 0.2}%)`;
                 playerCtx.fillRect(x, playerCanvas.height - bh, barW, bh);
                 x += barW + 1;
+                totalEnergy += data[i];
                 if (i < 12) bass += data[i];
+                else if (i < 48) mid += data[i];
+                else treble += data[i];
             }
             if (Date.now() - lastSentTime > 100 && writeChar) {
-                const avgBass = Math.min(255, Math.floor(bass / 12 * 1.6));
-                if (avgBass > 50) {
-                    const rgb = hslToRgb((Date.now() % 3000) / 3000, 1, Math.max(50, avgBass) / 255);
-                    setColor(rgb[0], rgb[1], rgb[2]);
+                const sens = micSensitivity / 5;
+                const avgEnergy = totalEnergy / data.length;
+                const aB = Math.min(255, Math.floor((bass / 12) * 1.55 * sens));
+                const aM = Math.min(255, Math.floor((mid / 36) * 1.4 * sens));
+                const aT = Math.min(255, Math.floor((treble / 80) * 1.35 * sens));
+                const aE = Math.min(255, Math.floor(avgEnergy * 1.45 * sens));
+
+                let r = 0, g = 0, b = 0;
+                switch (currentMusicModel) {
+                    case 1: if (aB > 25) { r = aB; g = Math.max(0, aB - 90); b = 255 - aB; } break;
+                    case 2: r = aB > 20 ? aB : 0; g = aM > 20 ? aM : 0; b = aT > 20 ? aT : 0; break;
+                    case 3:
+                        playerHueShift = (playerHueShift + Math.max(1, aB / 14)) % 360;
+                        if (aB > 16) { const rgb = hslToRgb(playerHueShift / 360, 1, Math.max(45, aB) / 255); r = rgb[0]; g = rgb[1]; b = rgb[2]; }
+                        break;
+                    case 4: if (aB > 145 || aT > 120) { r = g = b = 255; } break;
+                    case 5:
+                        playerHueShift = (playerHueShift + 2) % 360;
+                        if (aE > 12) { const rgb = hslToRgb(playerHueShift / 360, 1, aE / 255); r = rgb[0]; g = rgb[1]; b = rgb[2]; }
+                        break;
+                    case 6:
+                        if (aB > 120) { const rgb = hslToRgb(Math.random(), 1, 0.5); r = rgb[0]; g = rgb[1]; b = rgb[2]; }
+                        else { b = 35; }
+                        break;
+                    case 7: if (aM > 35) { r = aM; g = 255 - aM; b = aT; } break;
+                    case 8:
+                        playerHueShift = (playerHueShift + 0.6) % 360;
+                        if (aE > 10) { const rgb = hslToRgb(playerHueShift / 360, 0.7, Math.max(28, aE * 0.7) / 255); r = rgb[0]; g = rgb[1]; b = rgb[2]; }
+                        break;
                 }
+                if (r > 0 || g > 0 || b > 0 || currentMusicModel === 4 || currentMusicModel === 6) setColor(r, g, b);
             }
         }
 
         // --- MIC SYNC & BASS EQ ---
-        let micAudioCtx, micAnalyser, micSource, micBiquad, micRafId, isMicActive = false, micHueShift = 0;
+        let micAudioCtx, micAnalyser, micSource, micBiquad, micRafId, micStream = null, isMicActive = false, micHueShift = 0;
 
         async function startMicSync() {
             try {
+                stopAllActiveFX();
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                micStream = stream;
                 micAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 micAnalyser = micAudioCtx.createAnalyser();
                 micSource = micAudioCtx.createMediaStreamSource(stream);
@@ -2072,8 +2119,6 @@
 
                 micAnalyser.fftSize = 256;
                 isMicActive = true;
-                stopAllActiveFX();
-                isMicActive = true; // restore after clear
                 musicSyncBtn.textContent = 'Stop Listening';
                 musicSyncBtn.classList.replace('btn-primary', 'btn-outline');
                 tickMicVisualizer();
@@ -2086,6 +2131,12 @@
             musicSyncBtn.classList.replace('btn-outline', 'btn-primary');
             cancelAnimationFrame(micRafId);
             if (micAudioCtx) micAudioCtx.close();
+            if (micStream) micStream.getTracks().forEach(track => track.stop());
+            micAudioCtx = null;
+            micAnalyser = null;
+            micSource = null;
+            micBiquad = null;
+            micStream = null;
             visCtx.clearRect(0, 0, visualizer.width, visualizer.height);
         }
 
