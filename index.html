@@ -1996,8 +1996,98 @@
             }
         }
 
+        function clampByte(v) {
+            return Math.max(0, Math.min(255, Math.round(v)));
+        }
+
+        function mapReactiveColor(modelId, aB, aM, aT, aE, hueShift, impactFlip) {
+            const bass = clampByte(aB * 1.2 + 24);
+            const mid = clampByte(aM * 1.15 + 16);
+            const treble = clampByte(aT * 1.1 + 12);
+            const energy = clampByte(aE * 1.2 + 20);
+            let r = 0, g = 0, b = 0;
+
+            switch (modelId) {
+                case 1: {
+                    const hit = Math.max(0, bass - 40);
+                    r = 60 + hit * 1.2;
+                    g = 18 + mid * 0.45;
+                    b = 210 - hit * 0.6;
+                    break;
+                }
+                case 2: {
+                    r = bass;
+                    g = mid;
+                    b = treble;
+                    const peak = Math.max(r, g, b, 1);
+                    const gain = peak < 185 ? Math.min(1.7, 235 / peak) : 1;
+                    r *= gain;
+                    g *= gain;
+                    b *= gain;
+                    break;
+                }
+                case 3: {
+                    hueShift = (hueShift + Math.max(2, bass / 8 + energy / 40)) % 360;
+                    [r, g, b] = hslToRgb(hueShift / 360, 1, Math.min(0.72, Math.max(0.26, (energy + 30) / 255)));
+                    break;
+                }
+                case 4: {
+                    if (bass > 110 || treble > 95) {
+                        impactFlip = !impactFlip;
+                        if (impactFlip) {
+                            r = g = b = 255;
+                        } else {
+                            r = 255;
+                            g = 80 + mid * 0.7;
+                            b = 24 + treble * 0.35;
+                        }
+                    } else {
+                        r = 12;
+                    }
+                    break;
+                }
+                case 5: {
+                    hueShift = (hueShift + 4 + energy / 50) % 360;
+                    [r, g, b] = hslToRgb(
+                        hueShift / 360,
+                        Math.min(1, 0.75 + treble / 400),
+                        Math.min(0.8, Math.max(0.24, (energy + 24) / 220))
+                    );
+                    break;
+                }
+                case 6: {
+                    if (bass > 135) [r, g, b] = hslToRgb(Math.random(), 1, 0.5);
+                    else b = 55;
+                    break;
+                }
+                case 7: {
+                    const vocal = Math.max(mid, treble * 0.8);
+                    r = 35 + vocal * 1.15;
+                    g = 220 - vocal * 0.9;
+                    b = 55 + treble * 1.05;
+                    break;
+                }
+                case 8: {
+                    hueShift = (hueShift + 1 + energy / 120) % 360;
+                    const base = hslToRgb(hueShift / 360, 0.8, 0.18 + energy / 700);
+                    r = base[0];
+                    g = base[1];
+                    b = base[2];
+                    if (bass > 130 || treble > 120) {
+                        const spark = hslToRgb(Math.random(), 1, 0.58);
+                        r = Math.max(r, spark[0]);
+                        g = Math.max(g, spark[1]);
+                        b = Math.max(b, spark[2]);
+                    }
+                    break;
+                }
+            }
+
+            return { r: clampByte(r), g: clampByte(g), b: clampByte(b), hueShift, impactFlip };
+        }
+
         // --- MP3 AUDIO PLAYER ---
-        let playerAudioCtx, playerAnalyser, playerSource, playerRafId, isAudioPlaying = false, playerHueShift = 0;
+        let playerAudioCtx, playerAnalyser, playerSource, playerRafId, isAudioPlaying = false, playerHueShift = 0, playerImpactFlip = false;
         audioFileInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
@@ -2074,35 +2164,15 @@
                 const aT = Math.min(255, Math.floor((treble / 80) * 1.35 * sens));
                 const aE = Math.min(255, Math.floor(avgEnergy * 1.45 * sens));
 
-                let r = 0, g = 0, b = 0;
-                switch (currentMusicModel) {
-                    case 1: if (aB > 25) { r = aB; g = Math.max(0, aB - 90); b = 255 - aB; } break;
-                    case 2: r = aB > 20 ? aB : 0; g = aM > 20 ? aM : 0; b = aT > 20 ? aT : 0; break;
-                    case 3:
-                        playerHueShift = (playerHueShift + Math.max(1, aB / 14)) % 360;
-                        if (aB > 16) { const rgb = hslToRgb(playerHueShift / 360, 1, Math.max(45, aB) / 255); r = rgb[0]; g = rgb[1]; b = rgb[2]; }
-                        break;
-                    case 4: if (aB > 145 || aT > 120) { r = g = b = 255; } break;
-                    case 5:
-                        playerHueShift = (playerHueShift + 2) % 360;
-                        if (aE > 12) { const rgb = hslToRgb(playerHueShift / 360, 1, aE / 255); r = rgb[0]; g = rgb[1]; b = rgb[2]; }
-                        break;
-                    case 6:
-                        if (aB > 120) { const rgb = hslToRgb(Math.random(), 1, 0.5); r = rgb[0]; g = rgb[1]; b = rgb[2]; }
-                        else { b = 35; }
-                        break;
-                    case 7: if (aM > 35) { r = aM; g = 255 - aM; b = aT; } break;
-                    case 8:
-                        playerHueShift = (playerHueShift + 0.6) % 360;
-                        if (aE > 10) { const rgb = hslToRgb(playerHueShift / 360, 0.7, Math.max(28, aE * 0.7) / 255); r = rgb[0]; g = rgb[1]; b = rgb[2]; }
-                        break;
-                }
-                if (r > 0 || g > 0 || b > 0 || currentMusicModel === 4 || currentMusicModel === 6) setColor(r, g, b);
+                const mapped = mapReactiveColor(currentMusicModel, aB, aM, aT, aE, playerHueShift, playerImpactFlip);
+                playerHueShift = mapped.hueShift;
+                playerImpactFlip = mapped.impactFlip;
+                if (mapped.r > 0 || mapped.g > 0 || mapped.b > 0) setColor(mapped.r, mapped.g, mapped.b);
             }
         }
 
         // --- MIC SYNC & BASS EQ ---
-        let micAudioCtx, micAnalyser, micSource, micBiquad, micRafId, micStream = null, isMicActive = false, micHueShift = 0;
+        let micAudioCtx, micAnalyser, micSource, micBiquad, micRafId, micStream = null, isMicActive = false, micHueShift = 0, micImpactFlip = false;
 
         async function startMicSync() {
             try {
@@ -2185,31 +2255,10 @@
                 const aT = Math.min(255, Math.floor(treble / 40 * 1.5 * sens));
                 const aE = Math.min(255, Math.floor(avgEnergy * 1.5 * sens));
 
-                let r = 0, g = 0, b = 0;
-                switch (currentMusicModel) {
-                    case 1: if (aB > 45) { r = aB; g = Math.max(0, aB - 100); b = 255 - aB; } break;
-                    case 2: r = aB > 35 ? aB : 0; g = aM > 35 ? aM : 0; b = aT > 35 ? aT : 0; break;
-                    case 3:
-                        micHueShift = (micHueShift + aB / 10) % 360;
-                        if (aB > 25) { const rgb = hslToRgb(micHueShift / 360, 1, Math.max(50, aB) / 255); r = rgb[0]; g = rgb[1]; b = rgb[2]; }
-                        break;
-                    case 4: if (aB > 175 || aT > 145) { r = g = b = 255; } break;
-                    case 5:
-                        micHueShift = (micHueShift + 2) % 360;
-                        if (aE > 18) { const rgb = hslToRgb(micHueShift / 360, 1, aE / 255); r = rgb[0]; g = rgb[1]; b = rgb[2]; }
-                        break;
-                    case 6:
-                        if (aB > 165) { const rgb = hslToRgb(Math.random(), 1, 0.5); r = rgb[0]; g = rgb[1]; b = rgb[2]; }
-                        else { b = 45; }
-                        break;
-                    case 7: if (aM > 55) { r = aM; g = 255 - aM; b = aT; } break;
-                    case 8:
-                        micHueShift = (micHueShift + 0.4) % 360;
-                        const bright = aE > 10 ? Math.max(30, aE * 0.7) : 0;
-                        if (bright > 0) { const rgb = hslToRgb(micHueShift / 360, 0.7, bright / 255); r = rgb[0]; g = rgb[1]; b = rgb[2]; }
-                        break;
-                }
-                if (r > 0 || g > 0 || b > 0 || currentMusicModel === 4 || currentMusicModel === 6) setColor(r, g, b);
+                const mapped = mapReactiveColor(currentMusicModel, aB, aM, aT, aE, micHueShift, micImpactFlip);
+                micHueShift = mapped.hueShift;
+                micImpactFlip = mapped.impactFlip;
+                if (mapped.r > 0 || mapped.g > 0 || mapped.b > 0) setColor(mapped.r, mapped.g, mapped.b);
             }
         }
 
