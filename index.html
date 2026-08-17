@@ -1629,6 +1629,12 @@
             await sendCommand([0x7E, 0x07, 0x02, val, 0xFF, 0xFF, 0xFF, 0x00, 0xEF]);
         }
 
+        function setReactiveMusicModel(modelId) {
+            currentMusicModel = modelId;
+            $$('.model-chip').forEach(chip => chip.classList.toggle('active', parseInt(chip.dataset.model, 10) === modelId));
+            $$('.hw-music-card').forEach((card, idx) => card.classList.toggle('active', HW_MUSIC_MODES[idx]?.id === modelId));
+        }
+
         // --- NAVIGATION ---
         const tabList = ['tab-adjust', 'tab-style', 'tab-fx', 'tab-screen', 'tab-camera', 'tab-music', 'tab-mic', 'tab-glyph', 'tab-custom'];
         function switchTab(tabId) {
@@ -2458,9 +2464,7 @@
 
             $$('.model-chip').forEach(chip => {
                 chip.addEventListener('click', () => {
-                    $$('.model-chip').forEach(c => c.classList.remove('active'));
-                    chip.classList.add('active');
-                    currentMusicModel = parseInt(chip.dataset.model);
+                    setReactiveMusicModel(parseInt(chip.dataset.model, 10));
                 });
             });
             musicSyncBtn.addEventListener('click', () => isMicActive ? stopMicSync() : startMicSync());
@@ -2541,12 +2545,12 @@
                 card.className = 'hw-music-card';
                 card.innerHTML = `<span class="hw-music-icon">${m.icon}</span><span class="hw-music-name">${m.name}</span><span class="hw-music-desc">${m.desc}</span>`;
                 card.addEventListener('click', () => {
-                    $$('.hw-music-card').forEach(c => c.classList.remove('active'));
-                    card.classList.add('active');
-                    setMode(m.id);
+                    setReactiveMusicModel(m.id);
+                    if (!isAudioPlaying) setMode(m.id);
                 });
                 hwMusicGrid.appendChild(card);
             });
+            setReactiveMusicModel(currentMusicModel);
         }
 
         // --- VOICE ASSISTANT ---
