@@ -358,7 +358,7 @@ function populateHwMusic() {
 // --- MIC SYNC ---
 let audioCtx, analyser, source;
 let isMicActive = false;
-let rafId, hueShift = 0;
+let rafId, hueShift = 0, impactFlip = false, audioState = {};
 
 async function startMicSync() {
     try {
@@ -385,13 +385,95 @@ function stopMicSync() {
     visCtx.clearRect(0, 0, visualizer.width, visualizer.height);
 }
 
+function clampByte(v) { return Math.max(0, Math.min(255, Math.round(v))); }
+
+function mapReactiveColor(modelId, aB, aM, aT, aE, hShift, flip, state = {}) {
+    const bass = clampByte(aB * 1.25);
+    const mid = clampByte(aM * 1.2);
+    const treble = clampByte(aT * 1.15);
+    const energy = clampByte(aE * 1.3);
+    let r = 0, g = 0, b = 0;
+
+    if (!state.avgEnergy) state.avgEnergy = 20;
+    if (state.decayLevel === undefined) state.decayLevel = 0;
+    if (state.melodyHue === undefined) state.melodyHue = 200;
+    if (state.melodyBright === undefined) state.melodyBright = 0.2;
+
+    state.avgEnergy = state.avgEnergy * 0.92 + energy * 0.1;
+    const isBeat = energy > state.avgEnergy * 1.35 && bass > 60;
+
+    switch (modelId) {
+        case 1: {
+            const boost = isBeat ? 1.5 : 0.8;
+            const hit = Math.max(0, bass - 30) * boost;
+            r = clampByte(40 + hit * 1.4);
+            g = clampByte(10 + mid * 0.6);
+            b = clampByte(220 - hit * 0.7);
+            break;
+        }
+        case 2: {
+            const scale = isBeat ? 1.3 : 0.85;
+            r = clampByte(bass * scale);
+            g = clampByte(mid * scale);
+            b = clampByte(treble * scale);
+            break;
+        }
+        case 3: {
+            const speed = isBeat ? 12 : 2 + (energy / 40);
+            hShift = (hShift + speed) % 360;
+            const lightness = Math.min(0.75, Math.max(0.2, energy / 300));
+            [r, g, b] = hsl(hShift / 360, 1.0, lightness);
+            break;
+        }
+        case 4: {
+            if (isBeat) {
+                state.decayLevel = 1.0;
+                flip = !flip;
+            } else {
+                state.decayLevel = Math.max(0, state.decayLevel - 0.08);
+            }
+            const rippleHue = flip ? (180 + energy / 2) % 360 : (210 + bass / 2) % 360;
+            const brightness = Math.min(0.85, 0.15 + state.decayLevel * 0.7);
+            [r, g, b] = hsl(rippleHue / 360, 0.95, brightness);
+            break;
+        }
+        case 5: {
+            hShift = (hShift + 3 + (energy / 35)) % 360;
+            const pulseBright = Math.min(0.8, Math.max(0.15, (energy + 30) / 260));
+            [r, g, b] = hsl(hShift / 360, 0.9, pulseBright);
+            break;
+        }
+        case 6: {
+            state.melodyHue = (state.melodyHue + 0.5) % 360;
+            const targetBright = Math.min(0.85, Math.max(0.1, (energy + mid * 0.5) / 220));
+            state.melodyBright += (targetBright - state.melodyBright) * 0.08;
+            [r, g, b] = hsl(state.melodyHue / 360, 0.85, state.melodyBright);
+            break;
+        }
+        case 7: {
+            const vocal = Math.max(mid, treble * 0.9);
+            r = clampByte(20 + vocal * 1.2);
+            g = clampByte(220 - vocal * 0.8);
+            b = clampByte(60 + treble * 1.1);
+            break;
+        }
+        case 8: {
+            hShift = (hShift + 0.8 + (bass / 150)) % 360;
+            const baseLevel = Math.min(0.6, 0.15 + (energy / 500));
+            [r, g, b] = hsl(hShift / 360, 0.75, baseLevel);
+            break;
+        }
+    }
+
+    return { r: clampByte(r), g: clampByte(g), b: clampByte(b), hueShift: hShift, impactFlip: flip, audioState: state };
+}
+
 function tickMic() {
     if (!isMicActive) return;
     rafId = requestAnimationFrame(tickMic);
     const data = new Uint8Array(analyser.frequencyBinCount);
     analyser.getByteFrequencyData(data);
 
-    // Draw visualizer
     visCtx.clearRect(0, 0, visualizer.width, visualizer.height);
     const bw = visualizer.width / data.length * 2.5;
     let x = 0, bass = 0, mid = 0, treble = 0, total = 0;
@@ -407,47 +489,19 @@ function tickMic() {
         else treble += data[i];
     }
 
-    if (Date.now() - lastSentTime > 120 && writeChar) {
+    if (Date.now() - lastSentTime > 40 && writeChar) {
         const sens = micSensitivity / 5;
         const aB = Math.min(255, Math.floor(bass / 10 * 1.5 * sens));
         const aM = Math.min(255, Math.floor(mid / 40 * 1.5 * sens));
         const aT = Math.min(255, Math.floor(treble / 40 * 1.5 * sens));
         const aE = Math.min(255, Math.floor((total / data.length) * 1.5 * sens));
-        let r = 0, g = 0, b = 0;
 
-        switch (currentMusicModel) {
-            case 1: // Classic Beat
-                if (aB > 50) { r = aB; g = Math.max(0, aB - 100); b = 255 - aB; }
-                break;
-            case 2: // Dynamic RGB
-                r = aB > 40 ? aB : 0; g = aM > 40 ? aM : 0; b = aT > 40 ? aT : 0;
-                break;
-            case 3: // Rainbow Flow
-                hueShift = (hueShift + aB / 10) % 360;
-                if (aB > 30) { const c = hsl(hueShift / 360, 1, Math.max(50, aB) / 255); r = c[0]; g = c[1]; b = c[2]; }
-                break;
-            case 4: // Strobe Beat
-                if (aB > 180 || aT > 150) { r = g = b = 255; }
-                break;
-            case 5: // Energy Pulse
-                hueShift = (hueShift + 2) % 360;
-                if (aE > 20) { const c = hsl(hueShift / 360, 1, aE / 255); r = c[0]; g = c[1]; b = c[2]; }
-                break;
-            case 6: // Bass Drop
-                if (aB > 170) { const c = hsl(Math.random(), 1, 0.5); r = c[0]; g = c[1]; b = c[2]; }
-                else { b = 50; }
-                break;
-            case 7: // Vocal React
-                if (aM > 60) { r = aM; g = 255 - aM; b = aT; }
-                break;
-            case 8: // Chill Wave
-                hueShift = (hueShift + 0.5) % 360;
-                const bright = aE > 10 ? Math.max(30, aE * 0.6) : 0;
-                if (bright > 0) { const c = hsl(hueShift / 360, 0.6, bright / 255); r = c[0]; g = c[1]; b = c[2]; }
-                break;
-        }
-        if (r > 0 || g > 0 || b > 0 || currentMusicModel === 4 || currentMusicModel === 6) {
-            setColor(r, g, b);
+        const mapped = mapReactiveColor(currentMusicModel, aB, aM, aT, aE, hueShift, impactFlip, audioState);
+        hueShift = mapped.hueShift;
+        impactFlip = mapped.impactFlip;
+        audioState = mapped.audioState;
+        if (mapped.r > 0 || mapped.g > 0 || mapped.b > 0) {
+            setColor(mapped.r, mapped.g, mapped.b);
         }
     }
 }
