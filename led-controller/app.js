@@ -388,84 +388,109 @@ function stopMicSync() {
 function clampByte(v) { return Math.max(0, Math.min(255, Math.round(v))); }
 
 function mapReactiveColor(modelId, aB, aM, aT, aE, hShift, flip, state = {}) {
-    const bass = clampByte(aB * 1.25);
-    const mid = clampByte(aM * 1.2);
-    const treble = clampByte(aT * 1.15);
-    const energy = clampByte(aE * 1.3);
-    let r = 0, g = 0, b = 0;
+    const bass = clampByte(aB * 1.2);
+    const mid = clampByte(aM * 1.15);
+    const treble = clampByte(aT * 1.1);
+    const energy = clampByte(aE * 1.25);
 
-    if (!state.avgEnergy) state.avgEnergy = 20;
-    if (state.decayLevel === undefined) state.decayLevel = 0;
-    if (state.melodyHue === undefined) state.melodyHue = 200;
-    if (state.melodyBright === undefined) state.melodyBright = 0.2;
+    if (state.avgEnergy === undefined) state.avgEnergy = 25;
+    if (state.smoothR === undefined) state.smoothR = 40;
+    if (state.smoothG === undefined) state.smoothG = 10;
+    if (state.smoothB === undefined) state.smoothB = 60;
+    if (state.envelope === undefined) state.envelope = 0.2;
+    if (state.melodyHue === undefined) state.melodyHue = 280;
+    if (state.rippleDecay === undefined) state.rippleDecay = 0;
 
-    state.avgEnergy = state.avgEnergy * 0.92 + energy * 0.1;
-    const isBeat = energy > state.avgEnergy * 1.35 && bass > 60;
+    state.avgEnergy = state.avgEnergy * 0.94 + energy * 0.06;
+    const beatThreshold = Math.max(35, state.avgEnergy * 1.3);
+    const isBeat = (energy > beatThreshold) && (bass > 50);
+
+    const targetEnv = Math.min(1.0, Math.max(0.2, energy / 180));
+    if (targetEnv > state.envelope) {
+        state.envelope += (targetEnv - state.envelope) * 0.45;
+    } else {
+        state.envelope += (targetEnv - state.envelope) * 0.12;
+    }
+
+    let targetR = 0, targetG = 0, targetB = 0;
 
     switch (modelId) {
         case 1: {
-            const boost = isBeat ? 1.5 : 0.8;
-            const hit = Math.max(0, bass - 30) * boost;
-            r = clampByte(40 + hit * 1.4);
-            g = clampByte(10 + mid * 0.6);
-            b = clampByte(220 - hit * 0.7);
+            if (isBeat) { flip = !flip; state.rippleDecay = 1.0; }
+            else { state.rippleDecay *= 0.88; }
+            if (flip) {
+                targetR = Math.round(10 + state.rippleDecay * 235);
+                targetG = Math.round(180 * state.envelope + state.rippleDecay * 75);
+                targetB = Math.round(220 + state.rippleDecay * 35);
+            } else {
+                targetR = Math.round(230 * state.envelope + state.rippleDecay * 25);
+                targetG = Math.round(60 + state.rippleDecay * 140);
+                targetB = Math.round(180 * (1 - state.rippleDecay));
+            }
             break;
         }
         case 2: {
-            const scale = isBeat ? 1.3 : 0.85;
-            r = clampByte(bass * scale);
-            g = clampByte(mid * scale);
-            b = clampByte(treble * scale);
+            state.melodyHue = (state.melodyHue + 0.35 + (mid / 500)) % 360;
+            const bright = Math.min(0.8, Math.max(0.25, state.envelope * 0.85));
+            [targetR, targetG, targetB] = hsl(state.melodyHue / 360, 0.85, bright);
             break;
         }
         case 3: {
-            const speed = isBeat ? 12 : 2 + (energy / 40);
-            hShift = (hShift + speed) % 360;
-            const lightness = Math.min(0.75, Math.max(0.2, energy / 300));
-            [r, g, b] = hsl(hShift / 360, 1.0, lightness);
+            if (isBeat) { state.rippleDecay = 1.0; } else { state.rippleDecay *= 0.92; }
+            const baseHue = 195 + (treble / 10);
+            const rippleLum = Math.min(0.85, 0.2 + state.envelope * 0.3 + state.rippleDecay * 0.35);
+            [targetR, targetG, targetB] = hsl((baseHue % 360) / 360, 0.9, rippleLum);
             break;
         }
         case 4: {
-            if (isBeat) {
-                state.decayLevel = 1.0;
-                flip = !flip;
-            } else {
-                state.decayLevel = Math.max(0, state.decayLevel - 0.08);
-            }
-            const rippleHue = flip ? (180 + energy / 2) % 360 : (210 + bass / 2) % 360;
-            const brightness = Math.min(0.85, 0.15 + state.decayLevel * 0.7);
-            [r, g, b] = hsl(rippleHue / 360, 0.95, brightness);
+            hShift = (hShift + 1.5 + (energy / 40)) % 360;
+            const lum = Math.min(0.75, Math.max(0.3, state.envelope * 0.75));
+            [targetR, targetG, targetB] = hsl(hShift / 360, 0.95, lum);
             break;
         }
         case 5: {
-            hShift = (hShift + 3 + (energy / 35)) % 360;
-            const pulseBright = Math.min(0.8, Math.max(0.15, (energy + 30) / 260));
-            [r, g, b] = hsl(hShift / 360, 0.9, pulseBright);
+            if (bass > 110 && isBeat) { state.rippleDecay = 1.0; } else { state.rippleDecay *= 0.85; }
+            targetR = Math.round(120 + state.rippleDecay * 135);
+            targetG = Math.round(20 + state.rippleDecay * 180);
+            targetB = Math.round(40 + (1 - state.rippleDecay) * 80);
             break;
         }
         case 6: {
-            state.melodyHue = (state.melodyHue + 0.5) % 360;
-            const targetBright = Math.min(0.85, Math.max(0.1, (energy + mid * 0.5) / 220));
-            state.melodyBright += (targetBright - state.melodyBright) * 0.08;
-            [r, g, b] = hsl(state.melodyHue / 360, 0.85, state.melodyBright);
+            state.melodyHue = (state.melodyHue + 0.2) % 360;
+            const sunsetHue = 340 + Math.sin(state.melodyHue * Math.PI / 180) * 35;
+            const sunsetLum = Math.min(0.75, Math.max(0.28, state.envelope * 0.7));
+            [targetR, targetG, targetB] = hsl(((sunsetHue + 360) % 360) / 360, 0.9, sunsetLum);
             break;
         }
         case 7: {
             const vocal = Math.max(mid, treble * 0.9);
-            r = clampByte(20 + vocal * 1.2);
-            g = clampByte(220 - vocal * 0.8);
-            b = clampByte(60 + treble * 1.1);
+            const vocalGlow = Math.min(1.0, vocal / 160);
+            targetR = Math.round(240 * (0.4 + vocalGlow * 0.6));
+            targetG = Math.round(140 * (0.3 + vocalGlow * 0.7));
+            targetB = Math.round(50 + treble * 0.5);
             break;
         }
         case 8: {
-            hShift = (hShift + 0.8 + (bass / 150)) % 360;
-            const baseLevel = Math.min(0.6, 0.15 + (energy / 500));
-            [r, g, b] = hsl(hShift / 360, 0.75, baseLevel);
+            hShift = (hShift + (isBeat ? 20 : 2)) % 360;
+            const cyberHue = isBeat ? 310 : 185;
+            const cyberLum = Math.min(0.8, Math.max(0.3, state.envelope * 0.8));
+            [targetR, targetG, targetB] = hsl(cyberHue / 360, 1.0, cyberLum);
             break;
         }
     }
 
-    return { r: clampByte(r), g: clampByte(g), b: clampByte(b), hueShift: hShift, impactFlip: flip, audioState: state };
+    state.smoothR += (targetR - state.smoothR) * 0.28;
+    state.smoothG += (targetG - state.smoothG) * 0.28;
+    state.smoothB += (targetB - state.smoothB) * 0.28;
+
+    return {
+        r: clampByte(state.smoothR),
+        g: clampByte(state.smoothG),
+        b: clampByte(state.smoothB),
+        hueShift: hShift,
+        impactFlip: flip,
+        audioState: state
+    };
 }
 
 function tickMic() {
